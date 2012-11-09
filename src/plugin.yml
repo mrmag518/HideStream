@@ -1,0 +1,47 @@
+author: mrmag518
+main: com.mrmag518.HideStream.HideStream
+version: '2.4'
+name: HideStream
+description: "Hide join & Quit/Leave stream."
+commands:
+  hidestream:
+    description: Main command for HideStream.
+    usage: /hidestream
+    aliases: [hs]
+permissions:
+  hidestream.*:
+    default: op
+    children:
+      hidestream.recieveUpdates: true
+      hidestream.command.*: true
+      # Do not put the hidejoin .. permissions here.
+  hidestream.command.*:
+    default: op
+    children:
+      hidestream.command.list: true
+      hidestream.command.reload: true
+      hidestream.command.enable: true
+      hidestream.command.disable: true
+      hidestream.command.debug: true
+      hidestream.command.hideme: true
+  hidestream.hidejoin:
+    default: false
+  hidestream.hidequit:
+    default: false
+  hidestream.hidekick:
+    default: false
+  hidestream.recieveUpdates:
+    default: op
+  hidestream.command.list:
+    default: true
+  hidestream.command.reload:
+    default: op
+  hidestream.command.enable:
+    default: op
+  hidestream.command.disable:
+    default: op
+  hidestream.command.debug:
+    default: op
+  hidestream.command.hideme:
+    default: op
+  

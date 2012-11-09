@@ -1,0 +1,106 @@
+Version 2.5
+* Minor bug fixes & cleanup.
+* 
+
+Version 2.4
+* Ups.. I forgot to update the kick manager to use the new debug method ..
+* Now using MetricsLite instead of it's more heavy brother.
+* Corrected a mistake in the update checker.
+* Extended Vault support, to work for login and logout procedures too.
+* Supports 1.4.2-RO.1
+
+Version 2.3
+* The update checker checks for an update every 30min now.
+* Improved the update checker.
+* Improved the debug mode significantly.
+* Fixed some priority issues.
+* Added some more debug output where it may be usefull.
+* Done a lot of code cleanup.
+* Added Vault support.
+** This is an option, you don't need Vault installed in order for HideStream to work.
+* Some configuration tweaks.
+* Made it optional to check for HideStream updates.
+
+Version 2.2
+* Added 'EnablePerPlayerToggle'.
+** This feature allows players with the right permission node to decide if they want their stream to be enabled or disabled.
+** Added permission, hidestream.command.hideme
+** New command, /hs hideme (can also be used as /hs showme, since it's a toggle command)
+** If this is enabled, everything else under the stream categories, will be ignored.
+* Implemented plugin metrics.
+* Improved the reload command to check if the data folder exist.
+* Fixed the reload command to assign debug mode to config node.
+
+Version 2.1
+* Added two commands to disable and enable HideStream's stream features.
+** It doesn't disable/enable the plugin itself, only triggers an enable switch in the config which the events listens to.
+** New permissions: hidestream.command.enable and hidestream.command.disable
+* Added update checker.
+** Added permission, hidestream.recieveUpdates
+** When a new update is found, it will not download it, only notify you about the new update.
+* Fixed an issue with the join stream prevention.
+* Fixed an configuration issue with quit stream, which resulted in Quit.OnlyHideForUsersWithoutPermission to fail.
+* Added full debug mode.
+* Added a command to toggle debug mode. (/hs debug)
+** New permission, hidestream.command.debug
+* Supports R5.
+
+Version 2.01
+* Fixed an IllegalArgumentException with the permission node 'hidestream.join'.
+
+Version 2.0
+* Removed Method2.
+* Complete code rework.
+* New config, please delete the old one and let the new one generate.
+* New configuration nodes:
+** Join.HideJoinStream - Hide join messages.
+** Join.UsePermissions - Enable the user permissions feature. If this is disabled, join stream will be hided for everyone.
+** Join.OnlyHideForUsersWithPermission - Enable this and only those with the permission 'hidestream.hidejoin' will be hided.
+** Join.OnlyHideForUsersWithoutPermission - Enable this and only those without the permission 'hidestream.hidejoin' will be hided.
+** And the same applies for quit & kick.
+* New config header, now doesn't explain the config nodes in the file, but redirecting you too a site on BukkitDev explaining the nodes.
+* Fixed a configuration loading issue which some users may have had.
+* Commands are now in a seperate class.
+* There's now only one commands, with following arguments. Example: /hidestream reload
+* Commands can now be executed by typing /hs or /hidestream.
+* New permissions.
+** hidestream.hidejoin
+** hidestream.hidequit
+** hidestream.hidekick
+** hidestream.command.list
+** hidestream.command.reload
+* Customize the no permission message. (Commands)
+* Supports 1.2.5-R4.
+
+Version 1.06
+* Fixed the plugin not working and config file not generating.
+
+Version 1.05
+* Did some refactoring of classes.
+* Added '/hidestream' and '/hidestream-reload'.
+* Updated version in plugin.yml (sorry for users being confused about it displaying as 'v1.0')
+* Removed manually catching of exception during the DataFolder creation.
+* Supports 1.2.5-R2.0
+
+Version 1.04
+* Added a Method2 method if for somewhat reason Method1 doesn't work. (Please re-add the configuration file)
+* Support for 1.2.5
+
+Version 1.03
+* Made the "Only OPs" support only will work if the "For-everyone" is false.
+* Code cleanup.
+* Added a config header, which explains the configuration nodes.
+
+Version 1.02
+* Added OP only support.
+* Rewrote the configuration file. Note: You need to start with a fresh new "HideStream" folder.
+* Fixed console displaying wrong plugin version.
+
+Version 1.01
+* Rewrote the start-up loggers.
+* Added avoidance of Kick messages.
+* Added a configuration file.
+* Support for 1.2.3-RO.1
+
+Verson 1.0
+* Release.
