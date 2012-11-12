@@ -24,6 +24,7 @@ public class EventManager implements Listener {
         }
         Player joiner = event.getPlayer();
         boolean perPlayerToggle = plugin.getConfig().getBoolean("EnablePerPlayerToggle");
+        boolean OPSupport = plugin.getConfig().getBoolean("Join.OPSupport.Enabled");
         
         if(perPlayerToggle == true) 
         {
@@ -37,11 +38,11 @@ public class EventManager implements Listener {
         {
             plugin.debugLog("Join.HideJoinStream was true in the config, disabling join stream ..");
             
-            if(plugin.getConfig().getBoolean("Join.UsePermissions", true)) 
+            if(plugin.getConfig().getBoolean("Join.UsePermissions") == true) 
             {
                 plugin.debugLog("Join.UsePermissions was true in the config, using permissions ..");
                 
-                if(plugin.getConfig().getBoolean("Join.OnlyHideForUsersWithPermission", true)) 
+                if(plugin.getConfig().getBoolean("Join.OnlyHideForUsersWithPermission") == true) 
                 {
                     plugin.debugLog("Join.OnlyHideForUsersWithPermission was true in the config.");
                     
@@ -51,7 +52,7 @@ public class EventManager implements Listener {
                         plugin.debugLog(joiner.getName() + " had permission hidestream.hidejoin, disabled join message.");
                     }
                 } 
-                else if(plugin.getConfig().getBoolean("Join.OnlyHideForUsersWithoutPermission", true)) 
+                else if(plugin.getConfig().getBoolean("Join.OnlyHideForUsersWithoutPermission") == true) 
                 {
                     
                     plugin.debugLog("Join.OnlyHideForUsersWithoutPermission was true in the config.");
@@ -60,9 +61,27 @@ public class EventManager implements Listener {
                         event.setJoinMessage(null);
                         plugin.debugLog(joiner.getName() + " did not have permission hidestream.hidejoin, disabled join message.");
                     }
+                } else {
+                    plugin.debugLog("Error: Nor OnlyHideForUsersWithPermission or OnlyHideForUsersWithoutPermission in stream category join is set to true.");
                 }
             } else {
-                event.setJoinMessage(null);
+                if(OPSupport == true) {
+                    if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfNotOP") == true) {
+                        if(!joiner.isOp()) {
+                            event.setJoinMessage(null);
+                            plugin.debugLog(joiner.getName() + " is not op, disabled join message. (OnlyHideIfNotOP = true in config)");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfOP") == true) {
+                        if(joiner.isOp()) {
+                            event.setJoinMessage(null);
+                            plugin.debugLog(joiner.getName() + " is op, disabled join message. (OnlyHideIfOP = true in config)");
+                        }
+                    } else {
+                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category quit is set to true.");
+                    }
+                } else {
+                    event.setJoinMessage(null);
+                }
             }
         }
     }
@@ -74,6 +93,7 @@ public class EventManager implements Listener {
         }
         Player leaver = event.getPlayer();
         boolean perPlayerToggle = plugin.getConfig().getBoolean("EnablePerPlayerToggle");
+        boolean OPSupport = plugin.getConfig().getBoolean("Quit.OPSupport.Enabled");
         
         if(perPlayerToggle == true) 
         {
@@ -110,9 +130,27 @@ public class EventManager implements Listener {
                         event.setQuitMessage(null);
                         plugin.debugLog(leaver.getName() + " did not have permission hidestream.hidequit, disabled leave message.");
                     }
+                } else {
+                    plugin.debugLog("Error: Nor OnlyHideForUsersWithPermission or OnlyHideForUsersWithoutPermission in stream category quit is set to true.");
                 }
             } else {
-                event.setQuitMessage(null);
+                if(OPSupport == true) {
+                    if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfNotOP") == true) {
+                        if(!leaver.isOp()) {
+                            event.setQuitMessage(null);
+                            plugin.debugLog(leaver.getName() + " is not op, disabled quit message. (OnlyHideIfNotOP = true in config)");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfOP") == true) {
+                        if(leaver.isOp()) {
+                            event.setQuitMessage(null);
+                            plugin.debugLog(leaver.getName() + " is op, disabled quit message. (OnlyHideIfOP = true in config)");
+                        }
+                    } else {
+                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category quit is set to true.");
+                    }
+                } else {
+                    event.setQuitMessage(null);
+                }
             }
         }
     }
@@ -124,7 +162,7 @@ public class EventManager implements Listener {
         }
         Player kicked = event.getPlayer();
         boolean perPlayerToggle = plugin.getConfig().getBoolean("EnablePerPlayerToggle");
-        
+        boolean OPSupport = plugin.getConfig().getBoolean("Kick.OPSupport.Enabled");
         
         if(perPlayerToggle == true) 
         {
@@ -161,9 +199,27 @@ public class EventManager implements Listener {
                         event.setLeaveMessage(null);
                         plugin.debugLog(kicked.getName() + " did not have permission hidestream.hidekick, disabled leave message.");
                     }
+                } else {
+                    plugin.debugLog("Error: Nor OnlyHideForUsersWithPermission or OnlyHideForUsersWithoutPermission in stream category kick is set to true.");
                 }
             } else {
-                event.setLeaveMessage(null);
+                if(OPSupport == true) {
+                    if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfNotOP") == true) {
+                        if(!kicked.isOp()) {
+                            event.setLeaveMessage(null);
+                            plugin.debugLog(kicked.getName() + " is not op, disabled kick message. (OnlyHideIfNotOP = true in config)");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfOP") == true) {
+                        if(kicked.isOp()) {
+                            event.setLeaveMessage(null);
+                            plugin.debugLog(kicked.getName() + " is op, disabled kick message. (OnlyHideIfOP = true in config)");
+                        }
+                    } else {
+                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category kick is set to true.");
+                    }
+                } else {
+                    event.setLeaveMessage(null);
+                }
             }
         }
     }

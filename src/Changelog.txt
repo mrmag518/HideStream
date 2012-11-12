@@ -1,5 +1,10 @@
 Version 2.5
 * Minor bug fixes & cleanup.
+* Added OP suppport.
+** This will only work if 'UsePermissions' is false in the config. This is because permission nodes defaults to OP.
+** OPSupport is mostly for servers not using permissions, but you can of course use it with a permissions plugin.
+** New config options for each Stream category. "OPSupport"
+* Added some extra debug output.
 * 
 
 Version 2.4

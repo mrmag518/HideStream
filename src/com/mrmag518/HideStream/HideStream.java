@@ -138,16 +138,25 @@ public class HideStream extends JavaPlugin {
         config.addDefault("Join.UsePermissions", false);
         config.addDefault("Join.OnlyHideForUsersWithPermission", false);
         config.addDefault("Join.OnlyHideForUsersWithoutPermission", false);
+        config.addDefault("Join.OPSupport.Enabled", false);
+        config.addDefault("Join.OPSupport.OnlyHideIfNotOP", false);
+        config.addDefault("Join.OPSupport.OnlyHideIfOP", false);
         
         config.addDefault("Quit.HideQuitStream", true);
         config.addDefault("Quit.UsePermissions", false);
         config.addDefault("Quit.OnlyHideForUsersWithPermission", false);
         config.addDefault("Quit.OnlyHideForUsersWithoutPermission", false);
+        config.addDefault("Quit.OPSupport.Enabled", false);
+        config.addDefault("Quit.OPSupport.OnlyHideIfNotOP", false);
+        config.addDefault("Quit.OPSupport.OnlyHideIfOP", false);
         
         config.addDefault("Kick.HideKickStream", true);
         config.addDefault("Kick.UsePermissions", false);
         config.addDefault("Kick.OnlyHideForUsersWithPermission", false);
         config.addDefault("Kick.OnlyHideForUsersWithoutPermission", false);
+        config.addDefault("Kick.OPSupport.Enabled", false);
+        config.addDefault("Kick.OPSupport.OnlyHideIfNotOP", false);
+        config.addDefault("Kick.OPSupport.OnlyHideIfOP", false);
         
         getConfig().options().copyDefaults(true);
         saveConfig();
