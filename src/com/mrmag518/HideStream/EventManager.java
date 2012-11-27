@@ -9,12 +9,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class EventManager implements Listener {
     public static HideStream plugin;
-    public EventManager(HideStream instance)
-    {
+    public EventManager(HideStream instance) {
         plugin = instance;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
-    public String debugPrefix = "[HideStream DEBUG]" + " ";
     
     
     @EventHandler

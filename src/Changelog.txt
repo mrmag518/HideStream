@@ -1,11 +1,11 @@
 Version 2.5
-* Minor bug fixes & cleanup.
+* Minor bug fixes.
 * Added OP suppport.
 ** This will only work if 'UsePermissions' is false in the config. This is because permission nodes defaults to OP.
 ** OPSupport is mostly for servers not using permissions, but you can of course use it with a permissions plugin.
 ** New config options for each Stream category. "OPSupport"
 * Added some extra debug output.
-* 
+* Overall code cleanup.
 
 Version 2.4
 * Ups.. I forgot to update the kick manager to use the new debug method ..

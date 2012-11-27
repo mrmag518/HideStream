@@ -12,8 +12,7 @@ public class Commands implements CommandExecutor {
     {
         plugin = instance;
     }
-    public String PREFIX = ChatColor.WHITE+"["+ChatColor.DARK_AQUA+"HideStream"+ChatColor.WHITE+"]" + " ";
-    public String debugPrefix = "[HideStream DEBUG]" + " ";
+    public String PREFIX = ChatColor.WHITE+"["+ChatColor.DARK_AQUA+"HideStream"+ChatColor.WHITE+"] ";
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String l, String[] args){
@@ -21,7 +20,7 @@ public class Commands implements CommandExecutor {
             if(sender instanceof Player) {
                 if(args.length == 0) {
                     if(plugin.hasPermission(sender, "hidestream.command.list")) {
-                        if(plugin.debugMode == true) {plugin.log.info(debugPrefix + "Did command: /hidestream");}
+                        plugin.debugLog(sender.getName() + " was sent the commands page for HideStream.");
                         
                         sender.sendMessage(ChatColor.DARK_AQUA + "--- HideStream Commands ---");
                         sender.sendMessage(ChatColor.DARK_AQUA + " Commands can be executed by '/hs' or '/hidestream'.");
@@ -77,9 +76,8 @@ public class Commands implements CommandExecutor {
                         return disable(sender);
                     } else if(args[0].toString().equalsIgnoreCase("debug")) {
                         return toggleDebug(sender);
-                    } else if(args[0].toString().equalsIgnoreCase("hideme") 
-                            || args[0].toString().equalsIgnoreCase("showme")) {
-                        sender.sendMessage(ChatColor.RED + "Player command only.");
+                    } else if(args[0].toString().equalsIgnoreCase("hideme") || args[0].toString().equalsIgnoreCase("showme")) {
+                        sender.sendMessage(ChatColor.RED + "This is a player command only.");
                     } else {
                         sender.sendMessage(ChatColor.RED + "Invalid argument.");
                     }
@@ -94,22 +92,22 @@ public class Commands implements CommandExecutor {
     }
     
     public boolean reload(CommandSender sender) {
-        if(!(plugin.getDataFolder().exists())) {
+        if(!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdir();
         }
         plugin.reloadConfig();
-        StreamDB.reloadStreamDB();
+        StreamDB.reload();
         
-        try{
+        try {
             plugin.debugMode = plugin.getConfig().getBoolean("DebugMode");
             plugin.debugLog("debugMode assigned to config node.");
             plugin.debugLog("debugMode is enabled.");
-        }catch(Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
         
         sender.sendMessage(PREFIX + ChatColor.YELLOW + "Configuration file reloaded!");
-        if(plugin.debugMode == true) {plugin.log.info(debugPrefix + sender.getName() + " reloaded the configuration file.");}
+        plugin.debugLog("Player '" + sender.getName() + "' reloaded the configuration file and the database, by the command /hs reload.");
         return true;
     }
     

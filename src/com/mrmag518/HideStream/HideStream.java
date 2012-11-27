@@ -5,7 +5,9 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import net.milkbowl.vault.permission.Permission;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,10 +26,8 @@ public class HideStream extends JavaPlugin {
     public SendUpdate SU = null;
     public FileConfiguration config;
     public static Permission perms = null;
-    
     public double currentVersion;
     public double newVersion;
-    
     public boolean debugMode = false;
     public String debugPrefix = "[HideStream DEBUG] ";
     
@@ -52,17 +51,17 @@ public class HideStream extends JavaPlugin {
         loadConfig();
         reloadConfig();
         
-        StreamDB.reloadStreamDB();
-        StreamDB.loadStreamDB();
-        StreamDB.reloadStreamDB();
+        StreamDB.reload();
+        StreamDB.load();
+        StreamDB.reload();
         
         getCommand("hidestream").setExecutor(new Commands(this));
         
-        try{
+        try {
             debugMode = getConfig().getBoolean("DebugMode");
             debugLog("debugMode assigned to config node.");
             debugLog("debugMode is enabled.");
-        }catch(Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
         
@@ -91,7 +90,6 @@ public class HideStream extends JavaPlugin {
                 }
             }, 0, 36000);
         }
-        
         setupVault();
         
         try {

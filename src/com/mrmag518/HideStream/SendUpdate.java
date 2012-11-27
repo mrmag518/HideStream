@@ -9,12 +9,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class SendUpdate implements Listener {
     public static HideStream plugin;
-    public SendUpdate(HideStream instance)
-    {
+    public SendUpdate(HideStream instance) {
         plugin = instance;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
-    public String debugPrefix = "[HideStream DEBUG]" + " ";
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void sendUpdate(PlayerJoinEvent event) {
