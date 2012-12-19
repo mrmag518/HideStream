@@ -37,11 +37,11 @@ public class EventManager implements Listener {
             
             if(plugin.getConfig().getBoolean("Join.UsePermissions") == true) 
             {
-                plugin.debugLog("Join.UsePermissions was true in the config, using permissions ..");
+                plugin.debugLog("Join.Permissions.UsePermissions was true in the config, using permissions ..");
                 
-                if(plugin.getConfig().getBoolean("Join.OnlyHideForUsersWithPermission") == true) 
+                if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfHasPermission.") == true) 
                 {
-                    plugin.debugLog("Join.OnlyHideForUsersWithPermission was true in the config.");
+                    plugin.debugLog("Join.Permissions.HideOnlyIfHasPermission was true in the config.");
                     
                     if(plugin.hasPermission(joiner, "hidestream.hidejoin")) 
                     {
@@ -49,17 +49,17 @@ public class EventManager implements Listener {
                         plugin.debugLog(joiner.getName() + " had permission hidestream.hidejoin, disabled join message.");
                     }
                 } 
-                else if(plugin.getConfig().getBoolean("Join.OnlyHideForUsersWithoutPermission") == true) 
+                else if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfWithoutPermission") == true) 
                 {
                     
-                    plugin.debugLog("Join.OnlyHideForUsersWithoutPermission was true in the config.");
+                    plugin.debugLog("Join.Permissions.HideOnlyIfWithoutPermission was true in the config.");
                     if(!(plugin.hasPermission(joiner, "hidestream.hidejoin"))) 
                     {
                         event.setJoinMessage(null);
                         plugin.debugLog(joiner.getName() + " did not have permission hidestream.hidejoin, disabled join message.");
                     }
                 } else {
-                    plugin.debugLog("Error: Nor OnlyHideForUsersWithPermission or OnlyHideForUsersWithoutPermission in stream category join is set to true.");
+                    plugin.debugLog("Error: Nor HideOnlyIfWithoutPermission or HideOnlyIfHasPermission in stream category join is set to true.");
                 }
             } else {
                 if(OPSupport == true) {
@@ -74,7 +74,7 @@ public class EventManager implements Listener {
                             plugin.debugLog(joiner.getName() + " is op, disabled join message. (OnlyHideIfOP = true in config)");
                         }
                     } else {
-                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category quit is set to true.");
+                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category join is set to true.");
                     }
                 } else {
                     event.setJoinMessage(null);
@@ -104,31 +104,31 @@ public class EventManager implements Listener {
         {
             plugin.debugLog("Quit.HideQuitStream was true in the config, disabling quit stream ..");
             
-            if(plugin.getConfig().getBoolean("Quit.UsePermissions", true)) 
+            if(plugin.getConfig().getBoolean("Quit.Permissions.UsePermissions") == true) 
             {
-                plugin.debugLog("Quit.UsePermissions was true in the config, using permissions ..");
+                plugin.debugLog("Quit.Permissions.UsePermissions was true in the config, using permissions ..");
                 
-                if(plugin.getConfig().getBoolean("Quit.OnlyHideForUsersWithPermission", true)) 
+                if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfHasPermission.") == true) 
                 {
-                    plugin.debugLog("Quit.OnlyHideForUsersWithPermission was true in the config.");
+                    plugin.debugLog("Quit.Permissions.HideOnlyIfHasPermission was true in the config.");
                     
                     if(plugin.hasPermission(leaver, "hidestream.hidequit")) 
                     {
                         event.setQuitMessage(null);
-                        plugin.debugLog(leaver.getName() + " had permission hidestream.hidequit, disabled leave message.");
+                        plugin.debugLog(leaver.getName() + " had permission hidestream.hidequit, disabled quit message.");
                     }
                 } 
-                else if(plugin.getConfig().getBoolean("Quit.OnlyHideForUsersWithoutPermission", true)) 
+                else if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfWithoutPermission") == true) 
                 {
-                    plugin.debugLog("Quit.OnlyHideForUsersWithoutPermission was true in the config.");
                     
+                    plugin.debugLog("Quit.Permissions.HideOnlyIfWithoutPermission was true in the config.");
                     if(!(plugin.hasPermission(leaver, "hidestream.hidequit"))) 
                     {
                         event.setQuitMessage(null);
-                        plugin.debugLog(leaver.getName() + " did not have permission hidestream.hidequit, disabled leave message.");
+                        plugin.debugLog(leaver.getName() + " did not have permission hidestream.hidequit, disabled quit message.");
                     }
                 } else {
-                    plugin.debugLog("Error: Nor OnlyHideForUsersWithPermission or OnlyHideForUsersWithoutPermission in stream category quit is set to true.");
+                    plugin.debugLog("Error: Nor HideOnlyIfWithoutPermission or HideOnlyIfHasPermission in stream category quit is set to true.");
                 }
             } else {
                 if(OPSupport == true) {
@@ -173,31 +173,31 @@ public class EventManager implements Listener {
         {
             plugin.debugLog("Kick.HideKickStream was true in the config, disabling kick stream ..");
             
-            if(plugin.getConfig().getBoolean("Kick.UsePermissions", true)) 
+            if(plugin.getConfig().getBoolean("Kick.Permissions.UsePermissions") == true) 
             {
-                plugin.debugLog("Kick.UsePermissions was true in the config, using permissions ..");
+                plugin.debugLog("Kick.Permissions.UsePermissions was true in the config, using permissions ..");
                 
-                if(plugin.getConfig().getBoolean("Kick.OnlyHideForUsersWithPermission", true)) 
+                if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfHasPermission.") == true) 
                 {
-                    plugin.debugLog("Kick.OnlyHideForUsersWithPermission was true in the config.");
+                    plugin.debugLog("Kick.Permissions.HideOnlyIfHasPermission was true in the config.");
                     
                     if(plugin.hasPermission(kicked, "hidestream.hidekick")) 
                     {
                         event.setLeaveMessage(null);
-                        plugin.debugLog(kicked.getName() + " had permission hidestream.hidekick, disabled leave message.");
+                        plugin.debugLog(kicked.getName() + " had permission hidestream.hidekick, disabled kick message.");
                     }
                 } 
-                else if(plugin.getConfig().getBoolean("Kick.OnlyHideForUsersWithoutPermission", true)) 
+                else if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfWithoutPermission") == true) 
                 {
-                    plugin.debugLog("Kick.OnlyHideForUsersWithoutPermission was true in the config.");
                     
+                    plugin.debugLog("Kick.Permissions.HideOnlyIfWithoutPermission was true in the config.");
                     if(!(plugin.hasPermission(kicked, "hidestream.hidekick"))) 
                     {
                         event.setLeaveMessage(null);
-                        plugin.debugLog(kicked.getName() + " did not have permission hidestream.hidekick, disabled leave message.");
+                        plugin.debugLog(kicked.getName() + " did not have permission hidestream.hidekick, disabled kick message.");
                     }
                 } else {
-                    plugin.debugLog("Error: Nor OnlyHideForUsersWithPermission or OnlyHideForUsersWithoutPermission in stream category kick is set to true.");
+                    plugin.debugLog("Error: Nor HideOnlyIfWithoutPermission or HideOnlyIfHasPermission in stream category kick is set to true.");
                 }
             } else {
                 if(OPSupport == true) {
