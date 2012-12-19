@@ -1,3 +1,13 @@
+Version 2.6
+* Updated update check schedulers support.
+* Updated Vault support.
+* Updated MetricsLite support.
+* Rewrote the permissions related settings of each stream category.
+** Also added an automatic check & converter, which will convert your previous settings to the new ones automatically.
+** The new nodes look and are cleaner and are more easily read-able.
+* Small code cleanup.
+* Supports 1.4.5-R1.0
+
 Version 2.5
 * Minor bug fixes.
 * Added OP suppport.
@@ -6,6 +16,7 @@ Version 2.5
 ** New config options for each Stream category. "OPSupport"
 * Added some extra debug output.
 * Overall code cleanup.
+* Supports 1.4.5
 
 Version 2.4
 * Ups.. I forgot to update the kick manager to use the new debug method ..

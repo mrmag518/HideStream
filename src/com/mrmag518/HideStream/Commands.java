@@ -12,7 +12,7 @@ public class Commands implements CommandExecutor {
     {
         plugin = instance;
     }
-    public String PREFIX = ChatColor.WHITE+"["+ChatColor.DARK_AQUA+"HideStream"+ChatColor.WHITE+"] ";
+    private final String PREFIX = ChatColor.WHITE + "[" + ChatColor.DARK_AQUA + "HideStream" + ChatColor.WHITE + "] ";
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String l, String[] args){
@@ -91,7 +91,7 @@ public class Commands implements CommandExecutor {
         return false;
     }
     
-    public boolean reload(CommandSender sender) {
+    private boolean reload(CommandSender sender) {
         if(!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdir();
         }
@@ -111,7 +111,7 @@ public class Commands implements CommandExecutor {
         return true;
     }
     
-    public boolean enable(CommandSender sender) {
+    private boolean enable(CommandSender sender) {
         boolean state = plugin.getConfig().getBoolean("Enabled");
         if(state == true) {
             sender.sendMessage(PREFIX + ChatColor.RED + "HideStream is already enabled!");
@@ -124,7 +124,7 @@ public class Commands implements CommandExecutor {
         return true;
     }
     
-    public boolean disable(CommandSender sender) {
+    private boolean disable(CommandSender sender) {
         boolean state = plugin.getConfig().getBoolean("Enabled");
         if(state == false) {
             sender.sendMessage(PREFIX + ChatColor.RED + "HideStream is already disabled!");
@@ -137,7 +137,7 @@ public class Commands implements CommandExecutor {
         return true;
     }
     
-    public boolean toggleDebug(CommandSender sender) {
+    private boolean toggleDebug(CommandSender sender) {
         boolean state = plugin.debugMode;
         if(state == false) {
             plugin.getConfig().set("DebugMode", true);
@@ -155,7 +155,7 @@ public class Commands implements CommandExecutor {
         return true;
     }
     
-    public boolean toggleHidden(CommandSender sender) {
+    private boolean toggleHidden(CommandSender sender) {
         if(plugin.getConfig().getBoolean("EnablePerPlayerToggle") == true) {
             String name = sender.getName();
             if(StreamDB.getHiddenState(name) == true) {

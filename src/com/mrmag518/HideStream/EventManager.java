@@ -14,7 +14,6 @@ public class EventManager implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
     
-    
     @EventHandler
     public void joinManagement(PlayerJoinEvent event) {
         if(plugin.getConfig().getBoolean("Enabled") == false) {
