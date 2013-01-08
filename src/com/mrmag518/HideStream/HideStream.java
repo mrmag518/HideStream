@@ -1,10 +1,8 @@
 package com.mrmag518.HideStream;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.milkbowl.vault.permission.Permission;
 
@@ -15,10 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class HideStream extends JavaPlugin {
     public final Logger log = Logger.getLogger("Minecraft");
@@ -27,9 +21,9 @@ public class HideStream extends JavaPlugin {
     public FileConfiguration config;
     public static Permission perms = null;
     public double currentVersion;
-    public double newVersion;
     public boolean debugMode = false;
     public final String debugPrefix = "[HideStream DEBUG] ";
+    boolean updateFound = false;
     
     @Override
     public void onDisable() {
@@ -66,29 +60,32 @@ public class HideStream extends JavaPlugin {
         }
         
         if(getConfig().getBoolean("CheckForUpdates") == true) {
-            debugLog("Starting update check scheduler ..");
-            debugLog("Will check every 36000th tick.");
-            //Update checker - From MilkBowl.
-            getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        newVersion = updateCheck(currentVersion);
-
-                        if(newVersion > currentVersion) {
-                            log.info(" ");
-                            log.info("#######  HideStream UpdateChecker  #######");
-                            log.info("A new update for HideStream was found! " + newVersion);
-                            log.info("You are currently running version: " + currentVersion);
-                            log.info("You can find this new version at BukkitDev.");
-                            log.info("http://dev.bukkit.org/server-mods/hidestream/");
-                            log.info("#####################################");
-                            log.info(" ");
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }
-            }, 0, 36000);
+            log.info("Checking for updates ..");
+            Updater updater = new Updater(this, "hidestream", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+            
+            Updater.UpdateResult result = updater.getResult();
+            switch(result) {
+                case SUCCESS:
+                    break;
+                case NO_UPDATE:
+                    log.info("No update was found.");
+                    break;
+                case FAIL_DOWNLOAD:
+                    break;
+                case FAIL_DBO:
+                    log.warning("Failed to contact dev.bukkkit.org!");
+                    break;
+                case FAIL_NOVERSION:
+                    break;
+                case FAIL_BADSLUG:
+                    break;
+                case UPDATE_AVAILABLE:
+                    updateFound = true;
+                    log.info("########## HideStream update ##########");
+                    log.info("A new version of HideStream was found at DBO!");
+                    log.info("It's highly recommended to update, as there may be important fixes or improvements to the plugin!");
+                    log.info("#####################################");
+            }
         }
         setupVault();
         
@@ -293,27 +290,5 @@ public class HideStream extends JavaPlugin {
                 return false;
             }
         }
-    }
-    
-    //Update checker (from MilkBowl's Vault, all credits to him)
-    public double updateCheck(double currentVersion) throws Exception {
-        String pluginUrlString = "http://dev.bukkit.org/server-mods/hidestream/files.rss";
-        try {
-            URL url = new URL(pluginUrlString);
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(url.openConnection().getInputStream());
-            doc.getDocumentElement().normalize();
-            NodeList nodes = doc.getElementsByTagName("item");
-            Node firstNode = nodes.item(0);
-            if (firstNode.getNodeType() == 1) {
-                Element firstElement = (Element)firstNode;
-                NodeList firstElementTagName = firstElement.getElementsByTagName("title");
-                Element firstNameElement = (Element) firstElementTagName.item(0);
-                NodeList firstNodes = firstNameElement.getChildNodes();
-                return Double.valueOf(firstNodes.item(0).getNodeValue().replaceFirst(".", "").replace("v", "").trim());
-            }
-        }
-        catch (Exception localException) {
-        }
-        return currentVersion;
     }
 }

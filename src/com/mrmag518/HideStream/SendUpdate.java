@@ -19,10 +19,9 @@ public class SendUpdate implements Listener {
         Player p = event.getPlayer();
         if(p.hasPermission("hidestream.recieveUpdates") || p.isOp()) {
             try {
-                if (plugin.newVersion > plugin.currentVersion) {
-                    p.sendMessage(ChatColor.GREEN + "A new version of HideStream is out! ("+ ChatColor.WHITE +  plugin.newVersion + ChatColor.GREEN + ")");
-                    p.sendMessage(ChatColor.GREEN + "Current HideStream version running: " + ChatColor.WHITE + plugin.currentVersion + ChatColor.GREEN + ".");
-                    p.sendMessage(ChatColor.GREEN + "It's recommended updating :)");
+                if(plugin.updateFound == true) {
+                    p.sendMessage(ChatColor.GREEN + "A new version of HideStream is out!");
+                    p.sendMessage(ChatColor.GREEN + "It's highly recommended to update, as there may be important fixes or improvements to the plugin!");
                     
                     plugin.debugLog(p.getName() + " logged in and recieved the new update notify.");
                 }

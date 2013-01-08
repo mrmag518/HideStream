@@ -1,3 +1,9 @@
+Version 2.61
+* The updater has been revamped and changed to another one.
+** Credits to h31ix.
+** This fixes a server crash issue.
+* Supports 1.4.6
+
 Version 2.6
 * Updated update check schedulers support.
 * Updated Vault support.
