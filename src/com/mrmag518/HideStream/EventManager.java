@@ -53,7 +53,7 @@ public class EventManager implements Listener {
                 {
                     
                     plugin.debugLog("Join.Permissions.HideOnlyIfWithoutPermission was true in the config.");
-                    if(!(plugin.hasPermission(joiner, "hidestream.hidejoin"))) 
+                    if(!plugin.hasPermission(joiner, "hidestream.hidejoin")) 
                     {
                         event.setJoinMessage(null);
                         plugin.debugLog(joiner.getName() + " did not have permission hidestream.hidejoin, disabled join message.");
@@ -122,7 +122,7 @@ public class EventManager implements Listener {
                 {
                     
                     plugin.debugLog("Quit.Permissions.HideOnlyIfWithoutPermission was true in the config.");
-                    if(!(plugin.hasPermission(leaver, "hidestream.hidequit"))) 
+                    if(!plugin.hasPermission(leaver, "hidestream.hidequit")) 
                     {
                         event.setQuitMessage(null);
                         plugin.debugLog(leaver.getName() + " did not have permission hidestream.hidequit, disabled quit message.");
@@ -191,7 +191,7 @@ public class EventManager implements Listener {
                 {
                     
                     plugin.debugLog("Kick.Permissions.HideOnlyIfWithoutPermission was true in the config.");
-                    if(!(plugin.hasPermission(kicked, "hidestream.hidekick"))) 
+                    if(!plugin.hasPermission(kicked, "hidestream.hidekick")) 
                     {
                         event.setLeaveMessage(null);
                         plugin.debugLog(kicked.getName() + " did not have permission hidestream.hidekick, disabled kick message.");

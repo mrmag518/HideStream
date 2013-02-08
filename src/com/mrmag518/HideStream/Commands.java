@@ -8,15 +8,14 @@ import org.bukkit.entity.Player;
 
 public class Commands implements CommandExecutor {
     public static HideStream plugin;
-    public Commands(HideStream instance)
-    {
+    public Commands(HideStream instance){
         plugin = instance;
     }
     private final String PREFIX = ChatColor.WHITE + "[" + ChatColor.DARK_AQUA + "HideStream" + ChatColor.WHITE + "] ";
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String l, String[] args){
-        if(l.equalsIgnoreCase("hidestream") || l.equalsIgnoreCase("hs")) {
+        if(cmd.getName().equalsIgnoreCase("hidestream")) {
             if(sender instanceof Player) {
                 if(args.length == 0) {
                     if(plugin.hasPermission(sender, "hidestream.command.list")) {

@@ -1,3 +1,9 @@
+Version 2.7
+* Command handling improvements.
+* Fixed a npe ocurring whenever someone tried to toggle their hidden state.
+* Minor code clean up.
+* Permission handling improvements.
+
 Version 2.61
 * The updater has been revamped and changed to another one.
 ** Credits to h31ix.

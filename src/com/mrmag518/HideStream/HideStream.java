@@ -28,7 +28,7 @@ public class HideStream extends JavaPlugin {
     @Override
     public void onDisable() {
         PluginDescriptionFile pdffile = this.getDescription();
-        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " Disabled succesfully.");
+        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " disabled succesfully.");
     }
     
     @Override
@@ -38,7 +38,7 @@ public class HideStream extends JavaPlugin {
         currentVersion = Double.valueOf(getDescription().getVersion());
         
         if(!getDataFolder().exists()) {
-            getDataFolder().mkdir();
+            getDataFolder().mkdirs();
         }
         
         reloadConfig();
@@ -48,6 +48,8 @@ public class HideStream extends JavaPlugin {
         StreamDB.reload();
         StreamDB.load();
         StreamDB.reload();
+        
+        setupVault();
         
         getCommand("hidestream").setExecutor(new Commands(this));
         
@@ -82,12 +84,11 @@ public class HideStream extends JavaPlugin {
                 case UPDATE_AVAILABLE:
                     updateFound = true;
                     log.info("########## HideStream update ##########");
-                    log.info("A new version of HideStream was found at DBO!");
+                    log.info("A new version of HideStream was found!");
                     log.info("It's highly recommended to update, as there may be important fixes or improvements to the plugin!");
                     log.info("#####################################");
             }
         }
-        setupVault();
         
         try {
             MetricsLite metrics = new MetricsLite(this);
@@ -97,7 +98,7 @@ public class HideStream extends JavaPlugin {
         }
         
         PluginDescriptionFile pdffile = this.getDescription();
-        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " Enabled succesfully.");
+        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " enabled succesfully.");
     }
     
     public void debugLog(String output) {
@@ -233,12 +234,10 @@ public class HideStream extends JavaPlugin {
     }
     
     private void setupVault() {
-        if(getConfig().getBoolean("UseVault") == true) 
-        {
+        if(getConfig().getBoolean("UseVault") == true) {
             debugLog("UseVault is true in the config, checking Vault state ..");
             
-            if(getServer().getPluginManager().getPlugin("Vault") != null) 
-            {
+            if(getServer().getPluginManager().getPlugin("Vault") != null) {
                 debugLog("Vault found! Setting up permissions ..");
                 setupPermissions();
             } else {
@@ -280,15 +279,13 @@ public class HideStream extends JavaPlugin {
         if(getConfig().getBoolean("UseVault") == true) {
             if(perms.has(p, permission)) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         } else {
             if(p.hasPermission(permission)) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
     }
 }

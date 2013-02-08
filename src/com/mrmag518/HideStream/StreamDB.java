@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.Bukkit;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class StreamDB {
-    public static HideStream plugin;
+    private static final HideStream plugin = (HideStream) Bukkit.getPluginManager().getPlugin("HideStream");
     public static FileConfiguration streamDB = null;
     public static File streamDBFile = null;
     
@@ -47,7 +48,7 @@ public class StreamDB {
     public static void setHidden(String name, boolean value) {
         getStreamDB().set(name + ".hidden", value);
         save();
-        plugin.debugLog(name + "'s hidden state value was set to: " + value);
+        plugin.debugLog(name + "'s hidden state value was set to: " + String.valueOf(value));
     }
     
     public static boolean getHiddenState(String name) {
