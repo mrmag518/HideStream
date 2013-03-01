@@ -45,13 +45,15 @@ public class StreamDB {
         }
     }
     
-    public static void setHidden(String name, boolean value) {
-        getStreamDB().set(name + ".hidden", value);
+    public static void setHidden(String victim, boolean value) {
+        victim = victim.toLowerCase();
+        getStreamDB().set(victim + ".hidden", value);
         save();
-        plugin.debugLog(name + "'s hidden state value was set to: " + String.valueOf(value));
+        plugin.debugLog(victim + "'s hidden state value was set to: " + String.valueOf(value));
     }
     
-    public static boolean getHiddenState(String name) {
-        return getStreamDB().getBoolean(name + ".hidden");
+    public static boolean isHidden(String victim) {
+        victim = victim.toLowerCase();
+        return getStreamDB().getBoolean(victim + ".hidden");
     }
 }

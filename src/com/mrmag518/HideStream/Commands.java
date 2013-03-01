@@ -61,11 +61,11 @@ public class Commands implements CommandExecutor {
                 if(args.length == 0) {
                     sender.sendMessage(ChatColor.DARK_AQUA + "--- HideStream Commands ---");
                     sender.sendMessage(ChatColor.DARK_AQUA + " Commands can be executed by '/hs' or '/hidestream'.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs reload" + ChatColor.WHITE + " - " + ChatColor.DARK_AQUA + "Reload the config.yml file.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs reload" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Reload the config.yml file.");
                     sender.sendMessage(ChatColor.YELLOW + "/hs enable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
                     sender.sendMessage(ChatColor.YELLOW + "/hs disable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Disable HideStream's stream features.");
                     sender.sendMessage(ChatColor.YELLOW + "/hs debug" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle debug mode.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Hide your own stream.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle join, quit & leave stream for yourself.");
                 } else if(args.length == 1) {
                     if(args[0].toString().equalsIgnoreCase("reload")) {
                         return reload(sender);
@@ -155,9 +155,9 @@ public class Commands implements CommandExecutor {
     }
     
     private boolean toggleHidden(CommandSender sender) {
-        if(plugin.getConfig().getBoolean("EnablePerPlayerToggle") == true) {
-            String name = sender.getName();
-            if(StreamDB.getHiddenState(name) == true) {
+        if(plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) {
+            String name = sender.getName().toLowerCase();
+            if(StreamDB.isHidden(name)) {
                 StreamDB.setHidden(name, false);
                 sender.sendMessage(ChatColor.YELLOW + "Join, quit & kick messsages is now enabled for you.");
                 plugin.debugLog(name + " toggled his/hers hidden stream state to: false");

@@ -16,14 +16,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class HideStream extends JavaPlugin {
     public final Logger log = Logger.getLogger("Minecraft");
-    public EventManager streamListener = null;
-    public SendUpdate SU = null;
-    public FileConfiguration config;
+    private EventManager streamListener = null;
+    private SendUpdate SU = null;
+    private FileConfiguration config;
     public static Permission perms = null;
     public double currentVersion;
     public boolean debugMode = false;
-    public final String debugPrefix = "[HideStream DEBUG] ";
-    boolean updateFound = false;
+    private final String debugPrefix = "[HideStream DEBUG] ";
+    public boolean updateFound = false;
     
     @Override
     public void onDisable() {
@@ -111,7 +111,7 @@ public class HideStream extends JavaPlugin {
         sender.sendMessage(ChatColor.RED + colorize(config.getString("NoCommandPermissionMsg")));
     }
     
-    public String colorize(String s) {
+    private String colorize(String s) {
         if (s == null) {
             return null;
         }
@@ -127,8 +127,12 @@ public class HideStream extends JavaPlugin {
         config.addDefault("UseVault", false);
         config.addDefault("CheckForUpdates", true);
         config.addDefault("DebugMode", false);
-        config.addDefault("EnablePerPlayerToggle", false);
         config.addDefault("NoCommandPermissionMsg", "&cNo permission.");
+        
+        config.addDefault("PerPlayerToggle.Enable", false);
+        config.addDefault("PerPlayerToggle.AllowToEnable", false);
+        
+        checkConfig();
         
         config.addDefault("Join.HideJoinStream", true);
         config.addDefault("Join.Permissions.UsePermissions", false);
@@ -167,69 +171,10 @@ public class HideStream extends JavaPlugin {
     private void checkConfig() {
         config = getConfig();
         
-        if(config.get("Join.UsePermissions") != null) {
-            boolean storedValue = config.getBoolean("Join.UsePermissions");
-            config.set("Join.Permissions.UsePermissions", storedValue);
-            config.set("Join.UsePermissions", null);
-            log.info("[HideStream] Converted config node 'Join.UsePermissions: " + storedValue + "', into 'Join.Permissions.UsePermissions: " + storedValue + "'.");
-        }
-        
-        if(config.get("Join.OnlyHideForUsersWithPermission") != null) {
-            boolean storedValue = config.getBoolean("Join.OnlyHideForUsersWithPermission");
-            config.set("Join.Permissions.HideOnlyIfHasPermission", storedValue);
-            config.set("Join.OnlyHideForUsersWithPermission", null);
-            log.info("[HideStream] Converted config node 'Join.OnlyHideForUsersWithPermission: " + storedValue + "', into 'Join.Permissions.HideOnlyIfHasPermission: " + storedValue + "'.");
-        }
-        
-        if(config.get("Join.OnlyHideForUsersWithoutPermission") != null) {
-            boolean storedValue = config.getBoolean("Join.OnlyHideForUsersWithoutPermission");
-            config.set("Join.Permissions.HideOnlyIfWithoutPermission", storedValue);
-            config.set("Join.OnlyHideForUsersWithoutPermission", null);
-            log.info("[HideStream] Converted config node 'Join.OnlyHideForUsersWithoutPermission: " + storedValue + "', into 'Join.Permissions.HideOnlyIfWithoutPermission: " + storedValue + "'.");
-        }
-        
-        
-        if(config.get("Quit.UsePermissions") != null) {
-            boolean storedValue = config.getBoolean("Quit.UsePermissions");
-            config.set("Quit.Permissions.UsePermissions", storedValue);
-            config.set("Quit.UsePermissions", null);
-            log.info("[HideStream] Converted config node 'Quit.UsePermissions: " + storedValue + "', into 'Quit.Permissions.UsePermissions: " + storedValue + "'.");
-        }
-        
-        if(config.get("Quit.OnlyHideForUsersWithPermission") != null) {
-            boolean storedValue = config.getBoolean("Quit.OnlyHideForUsersWithPermission");
-            config.set("Quit.Permissions.HideOnlyIfHasPermission", storedValue);
-            config.set("Quit.OnlyHideForUsersWithPermission", null);
-            log.info("[HideStream] Converted config node 'Quit.OnlyHideForUsersWithPermission: " + storedValue + "', into 'Quit.Permissions.HideOnlyIfHasPermission: " + storedValue + "'.");
-        }
-        
-        if(config.get("Quit.OnlyHideForUsersWithoutPermission") != null) {
-            boolean storedValue = config.getBoolean("Quit.OnlyHideForUsersWithoutPermission");
-            config.set("Quit.Permissions.HideOnlyIfWithoutPermission", storedValue);
-            config.set("Quit.OnlyHideForUsersWithoutPermission", null);
-            log.info("[HideStream] Converted config node 'Quit.OnlyHideForUsersWithoutPermission: " + storedValue + "', into 'Quit.Permissions.HideOnlyIfWithoutPermission: " + storedValue + "'.");
-        }
-        
-        
-        if(config.get("Kick.UsePermissions") != null) {
-            boolean storedValue = config.getBoolean("Kick.UsePermissions");
-            config.set("Kick.Permissions.UsePermissions", storedValue);
-            config.set("Kick.UsePermissions", null);
-            log.info("[HideStream] Converted config node 'Kick.UsePermissions: " + storedValue + "', into 'Kick.Permissions.UsePermissions: " + storedValue + "'.");
-        }
-        
-        if(config.get("Kick.OnlyHideForUsersWithPermission") != null) {
-            boolean storedValue = config.getBoolean("Kick.OnlyHideForUsersWithPermission");
-            config.set("Kick.Permissions.HideOnlyIfHasPermission", storedValue);
-            config.set("Kick.OnlyHideForUsersWithPermission", null);
-            log.info("[HideStream] Converted config node 'Kick.OnlyHideForUsersWithPermission: " + storedValue + "', into 'Kick.Permissions.HideOnlyIfHasPermission: " + storedValue + "'.");
-        }
-        
-        if(config.get("Kick.OnlyHideForUsersWithoutPermission") != null) {
-            boolean storedValue = config.getBoolean("Kick.OnlyHideForUsersWithoutPermission");
-            config.set("Kick.Permissions.HideOnlyIfWithoutPermission", storedValue);
-            config.set("Kick.OnlyHideForUsersWithoutPermission", null);
-            log.info("[HideStream] Converted config node 'Kick.OnlyHideForUsersWithoutPermission: " + storedValue + "', into 'Kick.Permissions.HideOnlyIfWithoutPermission: " + storedValue + "'.");
+        if(config.contains("EnablePerPlayerToggle")) {
+            boolean oldValue = config.getBoolean("EnablePerPlayerToggle");
+            config.set("EnablePerPlayerToggle", null);
+            config.set("PerPlayerToggle.Enable", oldValue);
         }
     }
     

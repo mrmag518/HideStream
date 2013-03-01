@@ -2,6 +2,7 @@ package com.mrmag518.HideStream;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -14,207 +15,243 @@ public class EventManager implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
     
-    @EventHandler
-    public void joinManagement(PlayerJoinEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handleJoin(PlayerJoinEvent event) {
         if(plugin.getConfig().getBoolean("Enabled") == false) {
             return;
         }
-        Player joiner = event.getPlayer();
-        boolean perPlayerToggle = plugin.getConfig().getBoolean("EnablePerPlayerToggle");
+        Player p = event.getPlayer();
         boolean OPSupport = plugin.getConfig().getBoolean("Join.OPSupport.Enabled");
+        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        String type = "[Join] ";
         
-        if(perPlayerToggle == true) 
-        {
-            if(StreamDB.getHiddenState(joiner.getName()) == true) 
-            {
-                plugin.debugLog("perPlayerToggle is true in the config.");
-                event.setJoinMessage(null);
-            }
-        }
-        else if(plugin.getConfig().getBoolean("Join.HideJoinStream")) 
-        {
-            plugin.debugLog("Join.HideJoinStream was true in the config, disabling join stream ..");
-            
-            if(plugin.getConfig().getBoolean("Join.UsePermissions") == true) 
-            {
-                plugin.debugLog("Join.Permissions.UsePermissions was true in the config, using permissions ..");
-                
-                if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfHasPermission.") == true) 
-                {
-                    plugin.debugLog("Join.Permissions.HideOnlyIfHasPermission was true in the config.");
-                    
-                    if(plugin.hasPermission(joiner, "hidestream.hidejoin")) 
-                    {
-                        event.setJoinMessage(null);
-                        plugin.debugLog(joiner.getName() + " had permission hidestream.hidejoin, disabled join message.");
-                    }
-                } 
-                else if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfWithoutPermission") == true) 
-                {
-                    
-                    plugin.debugLog("Join.Permissions.HideOnlyIfWithoutPermission was true in the config.");
-                    if(!plugin.hasPermission(joiner, "hidestream.hidejoin")) 
-                    {
-                        event.setJoinMessage(null);
-                        plugin.debugLog(joiner.getName() + " did not have permission hidestream.hidejoin, disabled join message.");
-                    }
-                } else {
-                    plugin.debugLog("Error: Nor HideOnlyIfWithoutPermission or HideOnlyIfHasPermission in stream category join is set to true.");
+        if(StreamDB.isHidden(p.getName())) {
+            plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
+            event.setJoinMessage(null);
+        } else {
+            if(plugin.getConfig().getBoolean("Join.HideJoinStream")) {
+                if(allowToEnable) { // Player has chosen not to hide his stream.
+                    return;
                 }
-            } else {
-                if(OPSupport == true) {
-                    if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfNotOP") == true) {
-                        if(!joiner.isOp()) {
+                plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
+
+                if(plugin.getConfig().getBoolean("Join.Permissions.UsePermissions")) {
+                    plugin.debugLog(type + "UsePermissions is enabled in the config, using permissions ..");
+
+                    if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfHasPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfHasPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(plugin.hasPermission(p, "hidestream.hidejoin")) {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, proceeding to hide stream ..");
                             event.setJoinMessage(null);
-                            plugin.debugLog(joiner.getName() + " is not op, disabled join message. (OnlyHideIfNotOP = true in config)");
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, won't disable stream.");
                         }
-                    } else if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfOP") == true) {
-                        if(joiner.isOp()) {
+                    } else if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfWithoutPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfWithoutPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(!plugin.hasPermission(p, "hidestream.hidejoin")) {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, proceeding to hide stream ..");
                             event.setJoinMessage(null);
-                            plugin.debugLog(joiner.getName() + " is op, disabled join message. (OnlyHideIfOP = true in config)");
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, won't disable stream.");
                         }
                     } else {
-                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category join is set to true.");
+                        plugin.debugLog(type + "Nor HideOnlyIfHasPermission or HideOnlyIfWithoutPermission was enabled in the config, could not take any decision.");
+                    }
+                } else if(OPSupport) {
+                    plugin.debugLog(type + "OPSupport is enabled in the config, using OPSupport ..");
+
+                    if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfNotOP")) {
+                        plugin.debugLog(type + "OnlyHideIfNotOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(!p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is not an OP! proceeding to hide stream ..");
+                            event.setJoinMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is an OP, won't hide stream.");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfOP")) {
+                        plugin.debugLog(type + "OnlyHideIfOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is an OP! proceeding to hide stream ..");
+                            event.setJoinMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is not an OP, won't hide stream.");
+                        }
+                    } else {
+                        plugin.debugLog(type + "Nor OnlyHideIfNotOP or OnlyHideIfOP was enabled in the config, could not take any decision.");
                     }
                 } else {
+                    plugin.debugLog(type + "Nor UsePermission or OPSupport is enabled in the config!");
+                    plugin.debugLog(type + "Disabling stream for " + p.getName());
                     event.setJoinMessage(null);
                 }
             }
         }
     }
     
-    @EventHandler
-    public void quitManagement(PlayerQuitEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handleQuit(PlayerQuitEvent event) {
         if(plugin.getConfig().getBoolean("Enabled") == false) {
             return;
         }
-        Player leaver = event.getPlayer();
-        boolean perPlayerToggle = plugin.getConfig().getBoolean("EnablePerPlayerToggle");
+        Player p = event.getPlayer();
         boolean OPSupport = plugin.getConfig().getBoolean("Quit.OPSupport.Enabled");
+        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        String type = "[Quit] ";
         
-        if(perPlayerToggle == true) 
-        {
-            if(StreamDB.getHiddenState(leaver.getName()) == true)
-            {
-                plugin.debugLog("perPlayerToggle is true in the config.");
-                event.setQuitMessage(null);
-            }
-        } 
-        else if(plugin.getConfig().getBoolean("Quit.HideQuitStream"))
-        {
-            plugin.debugLog("Quit.HideQuitStream was true in the config, disabling quit stream ..");
-            
-            if(plugin.getConfig().getBoolean("Quit.Permissions.UsePermissions") == true) 
-            {
-                plugin.debugLog("Quit.Permissions.UsePermissions was true in the config, using permissions ..");
-                
-                if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfHasPermission.") == true) 
-                {
-                    plugin.debugLog("Quit.Permissions.HideOnlyIfHasPermission was true in the config.");
-                    
-                    if(plugin.hasPermission(leaver, "hidestream.hidequit")) 
-                    {
-                        event.setQuitMessage(null);
-                        plugin.debugLog(leaver.getName() + " had permission hidestream.hidequit, disabled quit message.");
-                    }
-                } 
-                else if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfWithoutPermission") == true) 
-                {
-                    
-                    plugin.debugLog("Quit.Permissions.HideOnlyIfWithoutPermission was true in the config.");
-                    if(!plugin.hasPermission(leaver, "hidestream.hidequit")) 
-                    {
-                        event.setQuitMessage(null);
-                        plugin.debugLog(leaver.getName() + " did not have permission hidestream.hidequit, disabled quit message.");
-                    }
-                } else {
-                    plugin.debugLog("Error: Nor HideOnlyIfWithoutPermission or HideOnlyIfHasPermission in stream category quit is set to true.");
+        if(StreamDB.isHidden(p.getName())) {
+            plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
+            event.setQuitMessage(null);
+        } else {
+            if(plugin.getConfig().getBoolean("Quit.HideQuitStream")){
+                if(allowToEnable) {
+                    return;
                 }
-            } else {
-                if(OPSupport == true) {
-                    if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfNotOP") == true) {
-                        if(!leaver.isOp()) {
+                plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
+
+                if(plugin.getConfig().getBoolean("Quit.Permissions.UsePermissions")) {
+                    plugin.debugLog(type + "UsePermissions is enabled in the config, using permissions ..");
+
+                    if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfHasPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfHasPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(plugin.hasPermission(p, "hidestream.hidequit")) {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, proceeding to hide stream ..");
                             event.setQuitMessage(null);
-                            plugin.debugLog(leaver.getName() + " is not op, disabled quit message. (OnlyHideIfNotOP = true in config)");
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, won't disable stream.");
                         }
-                    } else if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfOP") == true) {
-                        if(leaver.isOp()) {
+                    } else if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfWithoutPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfWithoutPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(!plugin.hasPermission(p, "hidestream.hidequit")) {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, proceeding to hide stream ..");
                             event.setQuitMessage(null);
-                            plugin.debugLog(leaver.getName() + " is op, disabled quit message. (OnlyHideIfOP = true in config)");
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, won't disable stream.");
                         }
                     } else {
-                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category quit is set to true.");
+                        plugin.debugLog(type + "Nor HideOnlyIfHasPermission or HideOnlyIfWithoutPermission was enabled in the config, could not take any decision.");
+                    }
+                } else if(OPSupport) {
+                    plugin.debugLog(type + "OPSupport is enabled in the config, using OPSupport ..");
+
+                    if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfNotOP")) {
+                        plugin.debugLog(type + "OnlyHideIfNotOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(!p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is not an OP! proceeding to hide stream ..");
+                            event.setQuitMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is an OP, won't hide stream.");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfOP")) {
+                        plugin.debugLog(type + "OnlyHideIfOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is an OP! proceeding to hide stream ..");
+                            event.setQuitMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is not an OP, won't hide stream.");
+                        }
+                    } else {
+                        plugin.debugLog(type + "Nor OnlyHideIfNotOP or OnlyHideIfOP was enabled in the config, could not take any decision.");
                     }
                 } else {
+                    plugin.debugLog(type + "Nor UsePermission or OPSupport is enabled in the config!");
+                    plugin.debugLog(type + "Disabling stream for " + p.getName());
                     event.setQuitMessage(null);
                 }
             }
         }
     }
     
-    @EventHandler
-    public void kickManagement(PlayerKickEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handleKick(PlayerKickEvent event) {
         if(plugin.getConfig().getBoolean("Enabled") == false) {
             return;
         }
-        Player kicked = event.getPlayer();
-        boolean perPlayerToggle = plugin.getConfig().getBoolean("EnablePerPlayerToggle");
+        Player p = event.getPlayer();
         boolean OPSupport = plugin.getConfig().getBoolean("Kick.OPSupport.Enabled");
+        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        String type = "[Kick] ";
         
-        if(perPlayerToggle == true) 
-        {
-            if(StreamDB.getHiddenState(kicked.getName()) == true)
-            {
-                plugin.debugLog("perPlayerToggle is true in the config.");
-                event.setLeaveMessage(null);
-            }
-        } 
-        else if(plugin.getConfig().getBoolean("Kick.HideKickStream"))
-        {
-            plugin.debugLog("Kick.HideKickStream was true in the config, disabling kick stream ..");
-            
-            if(plugin.getConfig().getBoolean("Kick.Permissions.UsePermissions") == true) 
-            {
-                plugin.debugLog("Kick.Permissions.UsePermissions was true in the config, using permissions ..");
-                
-                if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfHasPermission.") == true) 
-                {
-                    plugin.debugLog("Kick.Permissions.HideOnlyIfHasPermission was true in the config.");
-                    
-                    if(plugin.hasPermission(kicked, "hidestream.hidekick")) 
-                    {
-                        event.setLeaveMessage(null);
-                        plugin.debugLog(kicked.getName() + " had permission hidestream.hidekick, disabled kick message.");
-                    }
-                } 
-                else if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfWithoutPermission") == true) 
-                {
-                    
-                    plugin.debugLog("Kick.Permissions.HideOnlyIfWithoutPermission was true in the config.");
-                    if(!plugin.hasPermission(kicked, "hidestream.hidekick")) 
-                    {
-                        event.setLeaveMessage(null);
-                        plugin.debugLog(kicked.getName() + " did not have permission hidestream.hidekick, disabled kick message.");
-                    }
-                } else {
-                    plugin.debugLog("Error: Nor HideOnlyIfWithoutPermission or HideOnlyIfHasPermission in stream category kick is set to true.");
+        if(StreamDB.isHidden(p.getName())) {
+            plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
+            event.setLeaveMessage(null);
+        } else {
+            if(plugin.getConfig().getBoolean("Kick.HideKickStream")){
+                if(allowToEnable) { // Player has chosen not to hide his stream.
+                    return;
                 }
-            } else {
-                if(OPSupport == true) {
-                    if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfNotOP") == true) {
-                        if(!kicked.isOp()) {
+                plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
+
+                if(plugin.getConfig().getBoolean("Kick.Permissions.UsePermissions")) {
+                    plugin.debugLog(type + "UsePermissions is enabled in the config, using permissions ..");
+
+                    if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfHasPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfHasPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(plugin.hasPermission(p, "hidestream.hidekick")) {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, proceeding to hide stream ..");
                             event.setLeaveMessage(null);
-                            plugin.debugLog(kicked.getName() + " is not op, disabled kick message. (OnlyHideIfNotOP = true in config)");
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, won't disable stream.");
                         }
-                    } else if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfOP") == true) {
-                        if(kicked.isOp()) {
+                    } else if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfWithoutPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfWithoutPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(!plugin.hasPermission(p, "hidestream.hidekick")) {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, proceeding to hide stream ..");
                             event.setLeaveMessage(null);
-                            plugin.debugLog(kicked.getName() + " is op, disabled kick message. (OnlyHideIfOP = true in config)");
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, won't disable stream.");
                         }
                     } else {
-                        plugin.debugLog("Error: Nor OnlyHideIfNotOP or OnlyHideIfOP in stream category kick is set to true.");
+                        plugin.debugLog(type + "Nor HideOnlyIfHasPermission or HideOnlyIfWithoutPermission was enabled in the config, could not take any decision.");
+                    }
+                } else if(OPSupport) {
+                    plugin.debugLog(type + "OPSupport is enabled in the config, using OPSupport ..");
+
+                    if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfNotOP")) {
+                        plugin.debugLog(type + "OnlyHideIfNotOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(!p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is not an OP! proceeding to hide stream ..");
+                            event.setLeaveMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is an OP, won't hide stream.");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfOP")) {
+                        plugin.debugLog(type + "OnlyHideIfOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is an OP! proceeding to hide stream ..");
+                            event.setLeaveMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is not an OP, won't hide stream.");
+                        }
+                    } else {
+                        plugin.debugLog(type + "Nor OnlyHideIfNotOP or OnlyHideIfOP was enabled in the config, could not take any decision.");
                     }
                 } else {
+                    plugin.debugLog(type + "Nor UsePermission or OPSupport is enabled in the config!");
+                    plugin.debugLog(type + "Disabling stream for " + p.getName());
                     event.setLeaveMessage(null);
                 }
             }

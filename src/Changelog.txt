@@ -1,8 +1,21 @@
+Version 2.8
+* Rewrote the whole hide process.
+* Made it possible to have EnablePerPlayerToggle enabled without ignoring default stream settings.
+* Fixed permissions not working if HideOnlyIfHasPermission were enabled.
+* Rewrote lots of the debug output.
+* Made player checks in the StreamDB case-insensitive.
+* EnablePerPlayerToggle has been made into a small category in the config.
+** PerPlayerToggle.Enable -> Allow players to chose for themselves whether they want their stream to hidden or not.
+** PerPlayerToggle.AllowToEnable -> If for an example, Join.HideJoinStream is enabled, then this node will allow players who has not disabled their stream to enable it. If you don't enable this, players will only be able to hide their stream.
+** Will automatically convert from old settings to new.
+* Made it so HideStream will force to take priority over other plugins that modifies the join, quit & kick messages.
+
 Version 2.7
 * Command handling improvements.
 * Fixed a npe ocurring whenever someone tried to toggle their hidden state.
 * Minor code clean up.
 * Permission handling improvements.
+* Supports 1.4.7
 
 Version 2.61
 * The updater has been revamped and changed to another one.
