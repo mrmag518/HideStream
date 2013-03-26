@@ -1,3 +1,11 @@
+Version 2.9
+* Made it so if you have PerPlayerToggle disabled, the AllowToEnable node won't work either.
+* Added death stream handling.
+** New permission 'hidestream.hidedeath'.
+* Added 'NeedsToBeOnline' to each stream category.
+** This node represents the amount of players that needs to be online in order to proceeed hiding the specific stream type
+* Fixed a typo in the output when toggling stream.
+
 Version 2.8
 * Rewrote the whole hide process.
 * Made it possible to have EnablePerPlayerToggle enabled without ignoring default stream settings.

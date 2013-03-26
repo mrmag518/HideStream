@@ -1,9 +1,11 @@
 package com.mrmag518.HideStream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -30,11 +32,16 @@ public class EventManager implements Listener {
             event.setJoinMessage(null);
         } else {
             if(plugin.getConfig().getBoolean("Join.HideJoinStream")) {
-                if(allowToEnable) { // Player has chosen not to hide his stream.
+                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) { // Player has chosen not to hide his stream.
                     return;
                 }
                 plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
-
+                
+                if(Bukkit.getOnlinePlayers().length < plugin.getConfig().getInt("Join.NeedsToBeOnline")) {
+                    plugin.debugLog(type + "Not enough players online to hide stream!");
+                    return;
+                }
+                
                 if(plugin.getConfig().getBoolean("Join.Permissions.UsePermissions")) {
                     plugin.debugLog(type + "UsePermissions is enabled in the config, using permissions ..");
 
@@ -111,11 +118,16 @@ public class EventManager implements Listener {
             event.setQuitMessage(null);
         } else {
             if(plugin.getConfig().getBoolean("Quit.HideQuitStream")){
-                if(allowToEnable) {
+                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) {
                     return;
                 }
                 plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
-
+                
+                if(Bukkit.getOnlinePlayers().length < plugin.getConfig().getInt("Quit.NeedsToBeOnline")) {
+                    plugin.debugLog(type + "Not enough players online to hide stream!");
+                    return;
+                }
+                
                 if(plugin.getConfig().getBoolean("Quit.Permissions.UsePermissions")) {
                     plugin.debugLog(type + "UsePermissions is enabled in the config, using permissions ..");
 
@@ -192,11 +204,16 @@ public class EventManager implements Listener {
             event.setLeaveMessage(null);
         } else {
             if(plugin.getConfig().getBoolean("Kick.HideKickStream")){
-                if(allowToEnable) { // Player has chosen not to hide his stream.
+                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) { // Player has chosen not to hide his stream.
                     return;
                 }
                 plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
-
+                
+                if(Bukkit.getOnlinePlayers().length < plugin.getConfig().getInt("Kick.NeedsToBeOnline")) {
+                    plugin.debugLog(type + "Not enough players online to hide stream!");
+                    return;
+                }
+                
                 if(plugin.getConfig().getBoolean("Kick.Permissions.UsePermissions")) {
                     plugin.debugLog(type + "UsePermissions is enabled in the config, using permissions ..");
 
@@ -253,6 +270,92 @@ public class EventManager implements Listener {
                     plugin.debugLog(type + "Nor UsePermission or OPSupport is enabled in the config!");
                     plugin.debugLog(type + "Disabling stream for " + p.getName());
                     event.setLeaveMessage(null);
+                }
+            }
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handleDeath(PlayerDeathEvent event) {
+        if(plugin.getConfig().getBoolean("Enabled") == false) {
+            return;
+        }
+        Player p = event.getEntity();
+        boolean OPSupport = plugin.getConfig().getBoolean("Death.OPSupport.Enabled");
+        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        String type = "[Death] ";
+        
+        if(StreamDB.isHidden(p.getName())) {
+            plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
+            event.setDeathMessage(null);
+        } else {
+            if(plugin.getConfig().getBoolean("Death.HideDeathStream")){
+                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) { // Player has chosen not to hide his stream.
+                    return;
+                }
+                plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
+                
+                if(Bukkit.getOnlinePlayers().length < plugin.getConfig().getInt("Death.NeedsToBeOnline")) {
+                    plugin.debugLog(type + "Not enough players online to hide stream!");
+                    return;
+                }
+
+                if(plugin.getConfig().getBoolean("Death.Permissions.UsePermissions")) {
+                    plugin.debugLog(type + "UsePermissions is enabled in the config, using permissions ..");
+
+                    if(plugin.getConfig().getBoolean("Death.Permissions.HideOnlyIfHasPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfHasPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(plugin.hasPermission(p, "hidestream.hidedeath")) {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, proceeding to hide stream ..");
+                            event.setDeathMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, won't disable stream.");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Death.Permissions.HideOnlyIfWithoutPermission")) {
+                        plugin.debugLog(type + "HideOnlyIfWithoutPermission is enabled in the config, proceeding to check permissions for " + p.getName());
+
+                        if(!plugin.hasPermission(p, "hidestream.hidedeath")) {
+                            plugin.debugLog(type + p.getName() + " did not have the correct permission, proceeding to hide stream ..");
+                            event.setDeathMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " had the correct permission, won't disable stream.");
+                        }
+                    } else {
+                        plugin.debugLog(type + "Nor HideOnlyIfHasPermission or HideOnlyIfWithoutPermission was enabled in the config, could not take any decision.");
+                    }
+                } else if(OPSupport) {
+                    plugin.debugLog(type + "OPSupport is enabled in the config, using OPSupport ..");
+
+                    if(plugin.getConfig().getBoolean("Death.OPSupport.OnlyHideIfNotOP")) {
+                        plugin.debugLog(type + "OnlyHideIfNotOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(!p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is not an OP! proceeding to hide stream ..");
+                            event.setDeathMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is an OP, won't hide stream.");
+                        }
+                    } else if(plugin.getConfig().getBoolean("Death.OPSupport.OnlyHideIfOP")) {
+                        plugin.debugLog(type + "OnlyHideIfOP is enabled in the config, proceeding to check OP status of " + p.getName());
+
+                        if(p.isOp()) {
+                            plugin.debugLog(type + p.getName() + " is an OP! proceeding to hide stream ..");
+                            event.setDeathMessage(null);
+                            plugin.debugLog(type + "Stream were disabled for " + p.getName());
+                        } else {
+                            plugin.debugLog(type + p.getName() + " is not an OP, won't hide stream.");
+                        }
+                    } else {
+                        plugin.debugLog(type + "Nor OnlyHideIfNotOP or OnlyHideIfOP was enabled in the config, could not take any decision.");
+                    }
+                } else {
+                    plugin.debugLog(type + "Nor UsePermission or OPSupport is enabled in the config!");
+                    plugin.debugLog(type + "Disabling stream for " + p.getName());
+                    event.setDeathMessage(null);
                 }
             }
         }

@@ -135,6 +135,7 @@ public class HideStream extends JavaPlugin {
         checkConfig();
         
         config.addDefault("Join.HideJoinStream", true);
+        config.addDefault("Join.NeedsToBeOnline", 0);
         config.addDefault("Join.Permissions.UsePermissions", false);
         config.addDefault("Join.Permissions.HideOnlyIfHasPermission", false);
         config.addDefault("Join.Permissions.HideOnlyIfWithoutPermission", false);
@@ -143,6 +144,7 @@ public class HideStream extends JavaPlugin {
         config.addDefault("Join.OPSupport.OnlyHideIfOP", false);
         
         config.addDefault("Quit.HideQuitStream", true);
+        config.addDefault("Quit.NeedsToBeOnline", 0);
         config.addDefault("Quit.Permissions.UsePermissions", false);
         config.addDefault("Quit.Permissions.HideOnlyIfHasPermission", false);
         config.addDefault("Quit.Permissions.HideOnlyIfWithoutPermission", false);
@@ -151,12 +153,22 @@ public class HideStream extends JavaPlugin {
         config.addDefault("Quit.OPSupport.OnlyHideIfOP", false);
         
         config.addDefault("Kick.HideKickStream", true);
+        config.addDefault("Kick.NeedsToBeOnline", 0);
         config.addDefault("Kick.Permissions.UsePermissions", false);
         config.addDefault("Kick.Permissions.HideOnlyIfHasPermission", false);
         config.addDefault("Kick.Permissions.HideOnlyIfWithoutPermission", false);
         config.addDefault("Kick.OPSupport.Enabled", false);
         config.addDefault("Kick.OPSupport.OnlyHideIfNotOP", false);
         config.addDefault("Kick.OPSupport.OnlyHideIfOP", false);
+        
+        config.addDefault("Death.HideDeathStream", true);
+        config.addDefault("Death.NeedsToBeOnline", 0);
+        config.addDefault("Death.Permissions.UsePermissions", false);
+        config.addDefault("Death.Permissions.HideOnlyIfHasPermission", false);
+        config.addDefault("Death.Permissions.HideOnlyIfWithoutPermission", false);
+        config.addDefault("Death.OPSupport.Enabled", false);
+        config.addDefault("Death.OPSupport.OnlyHideIfNotOP", false);
+        config.addDefault("Death.OPSupport.OnlyHideIfOP", false);
         
         checkConfig();
         

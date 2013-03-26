@@ -27,7 +27,7 @@ public class Commands implements CommandExecutor {
                         sender.sendMessage(ChatColor.YELLOW + "/hs enable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
                         sender.sendMessage(ChatColor.YELLOW + "/hs disable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Disable HideStream's stream features.");
                         sender.sendMessage(ChatColor.YELLOW + "/hs debug" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle debug mode.");
-                        sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle join, quit & leave stream for yourself.");
+                        sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle stream for yourself.");
                     }
                 } else if(args.length == 1) {
                     if(args[0].toString().equalsIgnoreCase("reload")) {
@@ -65,7 +65,7 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(ChatColor.YELLOW + "/hs enable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
                     sender.sendMessage(ChatColor.YELLOW + "/hs disable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Disable HideStream's stream features.");
                     sender.sendMessage(ChatColor.YELLOW + "/hs debug" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle debug mode.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle join, quit & leave stream for yourself.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle stream for yourself.");
                 } else if(args.length == 1) {
                     if(args[0].toString().equalsIgnoreCase("reload")) {
                         return reload(sender);
@@ -112,7 +112,7 @@ public class Commands implements CommandExecutor {
     
     private boolean enable(CommandSender sender) {
         boolean state = plugin.getConfig().getBoolean("Enabled");
-        if(state == true) {
+        if(state != false) {
             sender.sendMessage(PREFIX + ChatColor.RED + "HideStream is already enabled!");
         } else {
             plugin.getConfig().set("Enabled", true);
@@ -125,7 +125,7 @@ public class Commands implements CommandExecutor {
     
     private boolean disable(CommandSender sender) {
         boolean state = plugin.getConfig().getBoolean("Enabled");
-        if(state == false) {
+        if(state != true) {
             sender.sendMessage(PREFIX + ChatColor.RED + "HideStream is already disabled!");
         } else {
             plugin.getConfig().set("Enabled", false);
@@ -138,14 +138,14 @@ public class Commands implements CommandExecutor {
     
     private boolean toggleDebug(CommandSender sender) {
         boolean state = plugin.debugMode;
-        if(state == false) {
+        if(state != true) {
             plugin.getConfig().set("DebugMode", true);
             plugin.saveConfig();
             plugin.debugMode = plugin.getConfig().getBoolean("DebugMode");
             sender.sendMessage(PREFIX + ChatColor.YELLOW + "Debug mode: on");
             plugin.debugLog("debugMode assigned to config node.");
             plugin.debugLog("debugMode is enabled.");
-        } else if(state == true) {
+        } else {
             plugin.getConfig().set("DebugMode", false);
             plugin.saveConfig();
             plugin.debugMode = plugin.getConfig().getBoolean("DebugMode");
@@ -159,12 +159,12 @@ public class Commands implements CommandExecutor {
             String name = sender.getName().toLowerCase();
             if(StreamDB.isHidden(name)) {
                 StreamDB.setHidden(name, false);
-                sender.sendMessage(ChatColor.YELLOW + "Join, quit & kick messsages is now enabled for you.");
-                plugin.debugLog(name + " toggled his/hers hidden stream state to: false");
+                sender.sendMessage(ChatColor.YELLOW + "Stream messsages is now disabled for you.");
+                plugin.debugLog(name + " toggled his hidden stream state to: false");
             } else {
                 StreamDB.setHidden(name, true);
-                sender.sendMessage(ChatColor.YELLOW + "Join, quit & kick messsages is now disabled for you.");
-                plugin.debugLog(name + " toggled his/hers hidden stream state to: true");
+                sender.sendMessage(ChatColor.YELLOW + "Stream messsages is now enabled for you.");
+                plugin.debugLog(name + " toggled his hidden stream state to: true");
             }
         } else {
             sender.sendMessage(ChatColor.RED + "This feature has not been enabled in the configuration file!");

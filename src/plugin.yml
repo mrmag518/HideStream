@@ -1,6 +1,6 @@
 author: mrmag518
 main: com.mrmag518.HideStream.HideStream
-version: '2.8'
+version: '2.9'
 name: HideStream
 description: "Hide join, quit & kick stream."
 commands:
@@ -29,6 +29,8 @@ permissions:
   hidestream.hidequit:
     default: false
   hidestream.hidekick:
+    default: false
+  hidestream.hidedeath:
     default: false
   hidestream.recieveUpdates:
     default: op
