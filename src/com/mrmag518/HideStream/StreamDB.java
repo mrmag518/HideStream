@@ -15,7 +15,14 @@ public class StreamDB {
     public static FileConfiguration streamDB = null;
     public static File streamDBFile = null;
     
+    public static void properLoad() {
+        reload();
+        load();
+        reload();
+    }
+    
     public static void load() {
+        getStreamDB().options().header("This file will only be in function if 'PerPlayerToggle' is enabled.");
         getStreamDB().options().copyDefaults(true);
         save();
     }
@@ -41,7 +48,7 @@ public class StreamDB {
         try {
             streamDB.save(streamDBFile);
         } catch (IOException ex) {
-            Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, "Could not save streamDBFile to " + streamDBFile, ex);
+            Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, "Could not save streamDB.yml to " + streamDBFile, ex);
         }
     }
     

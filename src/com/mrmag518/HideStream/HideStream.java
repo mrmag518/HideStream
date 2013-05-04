@@ -3,7 +3,6 @@ package com.mrmag518.HideStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
@@ -27,8 +26,8 @@ public class HideStream extends JavaPlugin {
     
     @Override
     public void onDisable() {
-        PluginDescriptionFile pdffile = this.getDescription();
-        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " disabled succesfully.");
+        PluginDescriptionFile pdffile = getDescription();
+        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " disabled.");
     }
     
     @Override
@@ -45,23 +44,18 @@ public class HideStream extends JavaPlugin {
         loadConfig();
         reloadConfig();
         
-        StreamDB.reload();
-        StreamDB.load();
-        StreamDB.reload();
+        StreamDB.properLoad();
         
         setupVault();
         
         getCommand("hidestream").setExecutor(new Commands(this));
         
-        try {
-            debugMode = getConfig().getBoolean("DebugMode");
-            debugLog("debugMode assigned to config node.");
-            debugLog("debugMode is enabled.");
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        debugMode = getConfig().getBoolean("DebugMode");
+        debugLog("debugMode assigned to config node.");
+        debugLog("debugMode is enabled.");
         
-        if(getConfig().getBoolean("CheckForUpdates") == true) {
+        PluginDescriptionFile pdffile = getDescription();
+        if(getConfig().getBoolean("CheckForUpdates")) {
             log.info("Checking for updates ..");
             Updater updater = new Updater(this, "hidestream", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
             
@@ -85,7 +79,8 @@ public class HideStream extends JavaPlugin {
                     updateFound = true;
                     log.info("########## HideStream update ##########");
                     log.info("A new version of HideStream was found!");
-                    log.info("It's highly recommended to update, as there may be important fixes or improvements to the plugin!");
+                    log.info("Version found: " + updater.getLatestVersionString());
+                    log.info("Version running: " + pdffile.getFullName());
                     log.info("#####################################");
             }
         }
@@ -97,12 +92,11 @@ public class HideStream extends JavaPlugin {
             // Failed to submit the stats :-(
         }
         
-        PluginDescriptionFile pdffile = this.getDescription();
-        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " enabled succesfully.");
+        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " enabled.");
     }
     
     public void debugLog(String output) {
-        if(debugMode == true) {
+        if(debugMode) {
             log.info(debugPrefix + output);
         }
     }
@@ -121,7 +115,7 @@ public class HideStream extends JavaPlugin {
     private void loadConfig() {
         config = getConfig();
         config.options().header("For an explanation of these configuration settings, please visit\n"
-                + "http://dev.bukkit.org/server-mods/hidestream/pages/config-explanation/" + " \n");
+                + "http://dev.bukkit.org/server-mods/hidestream/pages/config-explanation/ \n");
         
         config.addDefault("Enabled", true);
         config.addDefault("UseVault", false);
@@ -161,7 +155,7 @@ public class HideStream extends JavaPlugin {
         config.addDefault("Kick.OPSupport.OnlyHideIfNotOP", false);
         config.addDefault("Kick.OPSupport.OnlyHideIfOP", false);
         
-        config.addDefault("Death.HideDeathStream", true);
+        config.addDefault("Death.HideDeathStream", false);
         config.addDefault("Death.NeedsToBeOnline", 0);
         config.addDefault("Death.Permissions.UsePermissions", false);
         config.addDefault("Death.Permissions.HideOnlyIfHasPermission", false);
@@ -191,7 +185,7 @@ public class HideStream extends JavaPlugin {
     }
     
     private void setupVault() {
-        if(getConfig().getBoolean("UseVault") == true) {
+        if(getConfig().getBoolean("UseVault")) {
             debugLog("UseVault is true in the config, checking Vault state ..");
             
             if(getServer().getPluginManager().getPlugin("Vault") != null) {
@@ -215,7 +209,7 @@ public class HideStream extends JavaPlugin {
     }
     
     public boolean hasPermission(CommandSender sender, String permission) {
-        if(getConfig().getBoolean("UseVault") == true) {
+        if(getConfig().getBoolean("UseVault")) {
             if(perms.has(sender, permission)) {
                 return true;
             } else {
@@ -233,7 +227,7 @@ public class HideStream extends JavaPlugin {
     }
     
     public boolean hasPermission(Player p, String permission) {
-        if(getConfig().getBoolean("UseVault") == true) {
+        if(getConfig().getBoolean("UseVault")) {
             if(perms.has(p, permission)) {
                 return true;
             }

@@ -1,3 +1,9 @@
+Version x
+* Added a header to streamDB.yml.
+* Permission node 'hidestream.recieveUpdates' has been changed to 'hidestream.getupdates'.
+* Death messages will no longer be disabled by default.
+* 
+
 Version 2.9
 * Made it so if you have PerPlayerToggle disabled, the AllowToEnable node won't work either.
 * Added death stream handling.

@@ -17,16 +17,12 @@ public class SendUpdate implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void sendUpdate(PlayerJoinEvent event) {
         Player p = event.getPlayer();
-        if(p.hasPermission("hidestream.recieveUpdates") || p.isOp()) {
-            try {
-                if(plugin.updateFound == true) {
-                    p.sendMessage(ChatColor.GREEN + "A new version of HideStream is out!");
-                    p.sendMessage(ChatColor.GREEN + "It's highly recommended to update, as there may be important fixes or improvements to the plugin!");
-                    
-                    plugin.debugLog(p.getName() + " logged in and recieved the new update notify.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        if(p.hasPermission("hidestream.getupdates") || p.isOp()) {
+            if(plugin.updateFound) {
+                p.sendMessage(ChatColor.GREEN + "A new version of HideStream is out!");
+                p.sendMessage(ChatColor.GREEN + "It's highly recommended to update, as there may be important fixes or improvements to the plugin!");
+
+                plugin.debugLog(p.getName() + " received the new update notify.");
             }
         }
     }
