@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bukkit.Bukkit;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -54,13 +54,13 @@ public class StreamDB {
     
     public static void setHidden(String victim, boolean value) {
         victim = victim.toLowerCase();
-        getStreamDB().set(victim + ".hidden", value);
+        getStreamDB().set(victim, value);
         save();
         plugin.debugLog(victim + "'s hidden state value was set to: " + String.valueOf(value));
     }
     
     public static boolean isHidden(String victim) {
         victim = victim.toLowerCase();
-        return getStreamDB().getBoolean(victim + ".hidden");
+        return getStreamDB().getBoolean(victim);
     }
 }

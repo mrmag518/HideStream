@@ -21,34 +21,35 @@ public class Commands implements CommandExecutor {
                     if(plugin.hasPermission(sender, "hidestream.command.list")) {
                         plugin.debugLog(sender.getName() + " was sent the commands page for HideStream.");
                         
-                        sender.sendMessage(ChatColor.DARK_AQUA + "--- HideStream Commands ---");
-                        sender.sendMessage(ChatColor.DARK_AQUA + " Commands can be executed by '/hs' or '/hidestream'.");
-                        sender.sendMessage(ChatColor.YELLOW + "/hs reload" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Reload the config.yml file.");
-                        sender.sendMessage(ChatColor.YELLOW + "/hs enable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
-                        sender.sendMessage(ChatColor.YELLOW + "/hs disable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Disable HideStream's stream features.");
-                        sender.sendMessage(ChatColor.YELLOW + "/hs debug" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle debug mode.");
-                        sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle stream for yourself.");
+                        sender.sendMessage("------------------- " + ChatColor.YELLOW + "HideStream v" + plugin.currentVersion + ChatColor.WHITE + " -------------------");
+                        sender.sendMessage(ChatColor.GRAY + " Commands can be executed by '/hs' and '/hidestream'.");
+                        sender.sendMessage(ChatColor.YELLOW + "/hs reload" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Reload the config.yml file.");
+                        sender.sendMessage(ChatColor.YELLOW + "/hs enable" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
+                        sender.sendMessage(ChatColor.YELLOW + "/hs disable" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Disable HideStream's stream features.");
+                        sender.sendMessage(ChatColor.YELLOW + "/hs debug" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Toggle debug mode.");
+                        sender.sendMessage(ChatColor.YELLOW + "/hs toggle" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Toggle stream for yourself.");
+                        sender.sendMessage("-----------------------------------------------------");
                     }
                 } else if(args.length == 1) {
                     if(args[0].toString().equalsIgnoreCase("reload")) {
                         if(plugin.hasPermission(sender, "hidestream.command.reload")) {
-                            return reload(sender);
+                            reload(sender);
                         }
                     } else if(args[0].toString().equalsIgnoreCase("enable")) {
                         if(plugin.hasPermission(sender, "hidestream.command.enable")) {
-                            return enable(sender);
+                            enable(sender);
                         }
                     } else if(args[0].toString().equalsIgnoreCase("disable")) {
                         if(plugin.hasPermission(sender, "hidestream.command.disable")) {
-                            return disable(sender);
+                            disable(sender);
                         }
                     } else if(args[0].toString().equalsIgnoreCase("debug")) {
                         if(plugin.hasPermission(sender, "hidestream.command.debug")) {
-                            return toggleDebug(sender);
+                            toggleDebug(sender);
                         }
-                    } else if(args[0].toString().equalsIgnoreCase("hideme") || args[0].toString().equalsIgnoreCase("showme")) {
+                    } else if(args[0].toString().equalsIgnoreCase("toggle")) {
                         if(plugin.hasPermission(sender, "hidestream.command.hideme")) {
-                            return toggleHidden(sender);
+                            toggleHidden(sender);
                         }
                     } else {
                         sender.sendMessage(ChatColor.RED + "Invalid argument.");
@@ -59,23 +60,24 @@ public class Commands implements CommandExecutor {
                 }
             } else {
                 if(args.length == 0) {
-                    sender.sendMessage(ChatColor.DARK_AQUA + "--- HideStream Commands ---");
-                    sender.sendMessage(ChatColor.DARK_AQUA + " Commands can be executed by '/hs' or '/hidestream'.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs reload" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Reload the config.yml file.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs enable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs disable" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Disable HideStream's stream features.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs debug" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle debug mode.");
-                    sender.sendMessage(ChatColor.YELLOW + "/hs hideme" + ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + "Toggle stream for yourself.");
+                    sender.sendMessage("------------------- " + ChatColor.YELLOW + "HideStream v" + plugin.currentVersion + ChatColor.WHITE + " -------------------");
+                    sender.sendMessage(ChatColor.GRAY + " Commands can be executed by '/hs' and '/hidestream'.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs reload" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Reload the config.yml file.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs enable" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs disable" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Disable HideStream's stream features.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs debug" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Toggle debug mode.");
+                    sender.sendMessage(ChatColor.YELLOW + "/hs toggle" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Toggle stream for yourself.");
+                    sender.sendMessage("-----------------------------------------------------");
                 } else if(args.length == 1) {
                     if(args[0].toString().equalsIgnoreCase("reload")) {
-                        return reload(sender);
+                        reload(sender);
                     } else if(args[0].toString().equalsIgnoreCase("enable")) {
-                        return enable(sender);
+                        enable(sender);
                     } else if(args[0].toString().equalsIgnoreCase("disable")) {
-                        return disable(sender);
+                        disable(sender);
                     } else if(args[0].toString().equalsIgnoreCase("debug")) {
-                        return toggleDebug(sender);
-                    } else if(args[0].toString().equalsIgnoreCase("hideme") || args[0].toString().equalsIgnoreCase("showme")) {
+                        toggleDebug(sender);
+                    } else if(args[0].toString().equalsIgnoreCase("toggle")) {
                         sender.sendMessage(ChatColor.RED + "This is a player command only.");
                     } else {
                         sender.sendMessage(ChatColor.RED + "Invalid argument.");
@@ -90,27 +92,26 @@ public class Commands implements CommandExecutor {
         return false;
     }
     
-    private boolean reload(CommandSender sender) {
+    private void reload(CommandSender sender) {
         if(!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdir();
         }
         plugin.reloadConfig();
-        StreamDB.reload();
+        plugin.loadConfig();
+        plugin.reloadConfig();
         
-        try {
-            plugin.debugMode = plugin.getConfig().getBoolean("DebugMode");
-            plugin.debugLog("debugMode assigned to config node.");
-            plugin.debugLog("debugMode is enabled.");
-        } catch(Exception e) {
-            e.printStackTrace();
+        if(plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) {
+            StreamDB.properLoad();
         }
+        
+        plugin.debugMode = plugin.getConfig().getBoolean("DebugMode");
+        plugin.debugLog("debugMode is enabled.");
         
         sender.sendMessage(PREFIX + ChatColor.YELLOW + "Configuration file reloaded!");
         plugin.debugLog("Player '" + sender.getName() + "' reloaded the configuration file and the database, by the command /hs reload.");
-        return true;
     }
     
-    private boolean enable(CommandSender sender) {
+    private void enable(CommandSender sender) {
         boolean state = plugin.getConfig().getBoolean("Enabled");
         if(state != false) {
             sender.sendMessage(PREFIX + ChatColor.RED + "HideStream is already enabled!");
@@ -120,10 +121,9 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(PREFIX + ChatColor.YELLOW + "Enabled HideStream!");
             plugin.debugLog(sender.getName() + " enabled hidestream's stream features.");
         }
-        return true;
     }
     
-    private boolean disable(CommandSender sender) {
+    private void disable(CommandSender sender) {
         boolean state = plugin.getConfig().getBoolean("Enabled");
         if(state != true) {
             sender.sendMessage(PREFIX + ChatColor.RED + "HideStream is already disabled!");
@@ -133,10 +133,9 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(PREFIX + ChatColor.YELLOW + "Disabled HideStream!");
             plugin.debugLog(sender.getName() + " disabled hidestream's stream features.");
         }
-        return true;
     }
     
-    private boolean toggleDebug(CommandSender sender) {
+    private void toggleDebug(CommandSender sender) {
         boolean state = plugin.debugMode;
         if(state != true) {
             plugin.getConfig().set("DebugMode", true);
@@ -151,24 +150,22 @@ public class Commands implements CommandExecutor {
             plugin.debugMode = plugin.getConfig().getBoolean("DebugMode");
             sender.sendMessage(PREFIX + ChatColor.YELLOW + "Debug mode: off");
         }
-        return true;
     }
     
-    private boolean toggleHidden(CommandSender sender) {
+    private void toggleHidden(CommandSender sender) {
         if(plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) {
             String name = sender.getName().toLowerCase();
             if(StreamDB.isHidden(name)) {
                 StreamDB.setHidden(name, false);
-                sender.sendMessage(ChatColor.YELLOW + "Stream messsages is now disabled for you.");
+                sender.sendMessage(ChatColor.YELLOW + "Stream output is now enabled for you.");
                 plugin.debugLog(name + " toggled his hidden stream state to: false");
             } else {
                 StreamDB.setHidden(name, true);
-                sender.sendMessage(ChatColor.YELLOW + "Stream messsages is now enabled for you.");
+                sender.sendMessage(ChatColor.YELLOW + "Stream output is now disabled for you.");
                 plugin.debugLog(name + " toggled his hidden stream state to: true");
             }
         } else {
             sender.sendMessage(ChatColor.RED + "This feature has not been enabled in the configuration file!");
         }
-        return true;
     }
 }

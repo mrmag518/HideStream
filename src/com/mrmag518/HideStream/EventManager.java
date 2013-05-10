@@ -24,15 +24,17 @@ public class EventManager implements Listener {
         }
         Player p = event.getPlayer();
         boolean OPSupport = plugin.getConfig().getBoolean("Join.OPSupport.Enabled");
-        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
+        boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         String type = "[Join] ";
         
-        if(StreamDB.isHidden(p.getName())) {
+        if(StreamDB.isHidden(p.getName()) && ppt) {
             plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
             event.setJoinMessage(null);
         } else {
             if(plugin.getConfig().getBoolean("Join.HideJoinStream")) {
-                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) { // Player has chosen not to hide his stream.
+                if(streamEnabled && ppt) {
+                    plugin.debugLog(type + "Per player toggle: stream is enabled by default, will not disable stream for " + p.getName());
                     return;
                 }
                 plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
@@ -110,15 +112,17 @@ public class EventManager implements Listener {
         }
         Player p = event.getPlayer();
         boolean OPSupport = plugin.getConfig().getBoolean("Quit.OPSupport.Enabled");
-        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
+        boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         String type = "[Quit] ";
         
-        if(StreamDB.isHidden(p.getName())) {
+        if(StreamDB.isHidden(p.getName()) && ppt) {
             plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
             event.setQuitMessage(null);
         } else {
             if(plugin.getConfig().getBoolean("Quit.HideQuitStream")){
-                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) {
+                if(streamEnabled && ppt) {
+                    plugin.debugLog(type + "Per player toggle: stream is enabled by default, will not disable stream for " + p.getName());
                     return;
                 }
                 plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
@@ -196,15 +200,17 @@ public class EventManager implements Listener {
         }
         Player p = event.getPlayer();
         boolean OPSupport = plugin.getConfig().getBoolean("Kick.OPSupport.Enabled");
-        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
+        boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         String type = "[Kick] ";
         
-        if(StreamDB.isHidden(p.getName())) {
+        if(StreamDB.isHidden(p.getName()) && ppt) {
             plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
             event.setLeaveMessage(null);
         } else {
             if(plugin.getConfig().getBoolean("Kick.HideKickStream")){
-                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) { // Player has chosen not to hide his stream.
+                if(streamEnabled && ppt) {
+                    plugin.debugLog(type + "Per player toggle: stream is enabled by default, will not disable stream for " + p.getName());
                     return;
                 }
                 plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
@@ -282,15 +288,17 @@ public class EventManager implements Listener {
         }
         Player p = event.getEntity();
         boolean OPSupport = plugin.getConfig().getBoolean("Death.OPSupport.Enabled");
-        boolean allowToEnable = plugin.getConfig().getBoolean("PerPlayerToggle.AllowToEnable");
+        boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
+        boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         String type = "[Death] ";
         
-        if(StreamDB.isHidden(p.getName())) {
+        if(StreamDB.isHidden(p.getName()) && ppt) {
             plugin.debugLog(type + p.getName() + " is hidden, disabling stream ..");
             event.setDeathMessage(null);
         } else {
             if(plugin.getConfig().getBoolean("Death.HideDeathStream")){
-                if(allowToEnable && plugin.getConfig().getBoolean("PerPlayerToggle.Enable")) { // Player has chosen not to hide his stream.
+                if(streamEnabled && ppt) {
+                    plugin.debugLog(type + "Per player toggle: stream is enabled by default, will not disable stream for " + p.getName());
                     return;
                 }
                 plugin.debugLog(type + "Stream is enabled in the config, proceeding to disable stream ..");
