@@ -32,7 +32,7 @@ permissions:
     default: false
   hidestream.hidedeath:
     default: false
-  hidestream.recieveUpdates:
+  hidestream.getupdates:
     default: op
   hidestream.command.list:
     default: true

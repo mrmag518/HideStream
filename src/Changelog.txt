@@ -1,3 +1,6 @@
+Version 3.x
+* 
+
 Version 3.0
 * Added a header to streamDB.yml.
 * Permission node 'hidestream.recieveUpdates' has been changed to 'hidestream.getupdates'.
@@ -10,7 +13,7 @@ Version 3.0
 * Reverted the typo 'fix' from v2.9... Don’t know what I was thinking when I did that.
 * Changed the per player toggle command from '/hs hideme' to '/hs toggle'.
 ** Permission node for this command has not changed.
-* Fixed hidestream taking action according to the StreamDB.yml even if PerPlayerToggle was disabled.
+* Fixed hidestream taking action according to the streamDB.yml even if PerPlayerToggle was disabled.
 * Fixed config.yml not being generated properly if it did not exist when attempting to reload it.
 * Fixed permissions handling when using Vault not being appropriately handled if no supported permissions plugin by Vault was found.
 * Changed streamDB.yml format.
