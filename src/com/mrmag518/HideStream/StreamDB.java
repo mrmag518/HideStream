@@ -22,7 +22,7 @@ public class StreamDB {
     }
     
     public static void load() {
-        getStreamDB().options().header("This file will only be in function if 'PerPlayerToggle' is enabled.");
+        getStreamDB().options().header("This file will only be in function if 'PerPlayerToggle' is enabled.\n");
         getStreamDB().options().copyDefaults(true);
         save();
     }
@@ -56,7 +56,6 @@ public class StreamDB {
         victim = victim.toLowerCase();
         getStreamDB().set(victim, value);
         save();
-        plugin.debugLog(victim + "'s hidden state value was set to: " + String.valueOf(value));
     }
     
     public static boolean isHidden(String victim) {

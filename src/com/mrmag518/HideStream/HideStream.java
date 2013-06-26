@@ -23,8 +23,6 @@ public class HideStream extends JavaPlugin {
     private FileConfiguration config;
     public static Permission perms = null;
     public double currentVersion = 0;
-    public boolean debugMode = false;
-    private final String debugPrefix = "[HideStream DEBUG] ";
     public boolean updateFound = false;
     
     @Override
@@ -55,9 +53,6 @@ public class HideStream extends JavaPlugin {
         setupVault();
         
         getCommand("hidestream").setExecutor(new Commands(this));
-        
-        debugMode = getConfig().getBoolean("DebugMode");
-        debugLog("debugMode is enabled.");
         
         PluginDescriptionFile pdffile = getDescription();
         if(getConfig().getBoolean("CheckForUpdates")) {
@@ -97,12 +92,6 @@ public class HideStream extends JavaPlugin {
         log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " enabled.");
     }
     
-    public void debugLog(String output) {
-        if(debugMode) {
-            log.info(debugPrefix + output);
-        }
-    }
-    
     public void sendNoPerm(CommandSender sender) {
         sender.sendMessage(ChatColor.RED + colorize(config.getString("NoCommandPermissionMsg")));
     }
@@ -121,11 +110,11 @@ public class HideStream extends JavaPlugin {
         
         config.addDefault("Enabled", true);
         config.addDefault("UseVault", false);
-        config.addDefault("CheckForUpdates", true);
-        config.addDefault("DebugMode", false);
-        config.addDefault("NoCommandPermissionMsg", "&cNo permission.");
         
         checkConfig();
+        
+        config.addDefault("CheckForUpdates", true);
+        config.addDefault("NoCommandPermissionMsg", "&cNo permission.");
         
         config.addDefault("PerPlayerToggle.Enable", false);
         config.addDefault("PerPlayerToggle.StreamEnabledByDefault", true);
@@ -168,7 +157,7 @@ public class HideStream extends JavaPlugin {
         
         getConfig().options().copyDefaults(true);
         saveConfig();
-        debugLog(config.getName() + " loaded and saved successfully.");
+        log.info("[HideStream] Loaded configuration file.");
     }
     
     /**
@@ -179,6 +168,11 @@ public class HideStream extends JavaPlugin {
         
         if(config.get("PerPlayerToggle.AllowToEnable") != null) {
             config.set("PerPlayerToggle.AllowToEnable", null);
+            saveConfig();
+        }
+        
+        if(config.get("DebugMode") != null) {
+            config.set("DebugMode", null);
             saveConfig();
         }
     }
@@ -222,10 +216,7 @@ public class HideStream extends JavaPlugin {
     
     private void setupVault() {
         if(getConfig().getBoolean("UseVault")) {
-            debugLog("UseVault is true in the config, checking Vault state ..");
-            
             if(getServer().getPluginManager().getPlugin("Vault") != null) {
-                debugLog("Vault found! Setting up permissions ..");
                 setupPermissions();
             } else {
                 log.severe("[HideStream] Vault.jar was NOT found in your plugins folder!");

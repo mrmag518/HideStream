@@ -1,6 +1,6 @@
 author: mrmag518
 main: com.mrmag518.HideStream.HideStream
-version: '3.0'
+version: '3.1'
 name: HideStream
 description: "Hide spam output such as Join/Leave messages."
 commands:
@@ -14,7 +14,6 @@ permissions:
     children:
       hidestream.recieveUpdates: true
       hidestream.command.*: true
-      # Do not put the hidejoin .. permissions here.
   hidestream.command.*:
     default: op
     children:
@@ -22,7 +21,6 @@ permissions:
       hidestream.command.reload: true
       hidestream.command.enable: true
       hidestream.command.disable: true
-      hidestream.command.debug: true
       hidestream.command.hideme: true
   hidestream.hidejoin:
     default: false
@@ -42,8 +40,8 @@ permissions:
     default: op
   hidestream.command.disable:
     default: op
-  hidestream.command.debug:
-    default: op
   hidestream.command.hideme:
+    default: op
+  hidestream.command.hideme.others:
     default: op
   

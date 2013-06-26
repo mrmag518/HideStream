@@ -1,5 +1,12 @@
-Version 3.x
-* 
+Version 3.1
+* Removed all debug content.
+* Overall code cleanup & optimization.
+* Changed the output for stream toggling to be a bit more easily understandable.
+* The /hs toggle command now supports other players. Example: /hs toggle mrmag518
+** New permissions, hidestream.command.hideme.others
+** Supports console.
+* Made the commands page look a bit neater.
+* Supports latest RB. (1.5.2 R1)
 
 Version 3.0
 * Added a header to streamDB.yml.

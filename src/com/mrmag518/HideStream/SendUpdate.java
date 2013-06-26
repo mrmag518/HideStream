@@ -21,8 +21,6 @@ public class SendUpdate implements Listener {
             if(plugin.updateFound) {
                 p.sendMessage(ChatColor.GREEN + "A new version of HideStream is out!");
                 p.sendMessage(ChatColor.GREEN + "It's highly recommended to update, as there may be important fixes or improvements to the plugin!");
-
-                plugin.debugLog(p.getName() + " received the new update notify.");
             }
         }
     }
