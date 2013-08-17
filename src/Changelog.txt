@@ -1,3 +1,7 @@
+Version 3.2
+* Updated metrics to R7.
+* 
+
 Version 3.1
 * Removed all debug content.
 * Overall code cleanup & optimization.

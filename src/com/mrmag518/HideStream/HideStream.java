@@ -86,7 +86,6 @@ public class HideStream extends JavaPlugin {
             MetricsLite metrics = new MetricsLite(this);
             metrics.start();
         } catch (IOException e) {
-            // Failed to submit the stats :-(
         }
         
         log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " enabled.");
