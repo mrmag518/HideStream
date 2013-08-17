@@ -17,8 +17,10 @@ public class Commands implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String l, String[] args){
         if(cmd.getName().equalsIgnoreCase("hidestream")) {
             if(sender instanceof Player) {
+                Player p = (Player)sender;
+                
                 if(args.length == 0) {
-                    if(plugin.hasPermission(sender, "hidestream.command.list")) {
+                    if(plugin.hasPermission(p, "hidestream.command.list", true)) {
                         sender.sendMessage("------------------- " + ChatColor.YELLOW + "HideStream v" + plugin.currentVersion + ChatColor.WHITE + " -------------------");
                         sender.sendMessage(ChatColor.YELLOW + "/hs reload\n" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Reload the configuration file.");
                         sender.sendMessage(ChatColor.YELLOW + "/hs enable\n" + ChatColor.GRAY + " -> " + ChatColor.DARK_AQUA + "Enable HideStream's stream features.");
@@ -28,29 +30,29 @@ public class Commands implements CommandExecutor {
                     }
                 } else if(args.length > 0) {
                     if(args[0].equalsIgnoreCase("reload")) {
-                        if(plugin.hasPermission(sender, "hidestream.command.reload")) {
+                        if(plugin.hasPermission(p, "hidestream.command.reload", true)) {
                             reload(sender);
                         }
                     } else if(args[0].equalsIgnoreCase("enable")) {
-                        if(plugin.hasPermission(sender, "hidestream.command.enable")) {
+                        if(plugin.hasPermission(p, "hidestream.command.enable", true)) {
                             enable(sender);
                         }
                     } else if(args[0].equalsIgnoreCase("disable")) {
-                        if(plugin.hasPermission(sender, "hidestream.command.disable")) {
+                        if(plugin.hasPermission(p, "hidestream.command.disable", true)) {
                             disable(sender);
                         }
                     } else if(args[0].equalsIgnoreCase("toggle")) {
                         if(args.length == 1) {
-                            if(plugin.hasPermission(sender, "hidestream.command.hideme")) {
+                            if(plugin.hasPermission(p, "hidestream.command.hideme", true)) {
                                 toggleHidden(sender, sender.getName(), true);
                             }
                         } else if(args.length == 2){
-                            if(plugin.hasPermission(sender, "hidestream.command.hideme.others")) {
+                            if(plugin.hasPermission(p, "hidestream.command.hideme.others", true)) {
                                 toggleHidden(sender, args[1], false);
                             }
                         }
                     } else {
-                        sender.sendMessage(PREFIX + ChatColor.RED + "Invalid argument.");
+                        sender.sendMessage(PREFIX + ChatColor.RED + "Invalid command. Run '/hidestream' for help.");
                     }
                 }
             } else {
@@ -75,7 +77,7 @@ public class Commands implements CommandExecutor {
                             toggleHidden(sender, args[1], false);
                         }
                     } else {
-                        sender.sendMessage("Invalid argument.");
+                        sender.sendMessage("Invalid command. Run '/hidestream' for help.");
                     }
                 }
             }
@@ -85,9 +87,8 @@ public class Commands implements CommandExecutor {
     }
     
     private void reload(CommandSender sender) {
-        if(!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdir();
-        }
+        if(!plugin.getDataFolder().exists()) plugin.getDataFolder().mkdir();
+        
         plugin.reloadConfig();
         plugin.loadConfig();
         plugin.reloadConfig();

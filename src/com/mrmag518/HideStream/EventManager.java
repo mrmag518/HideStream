@@ -19,18 +19,16 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleJoin(PlayerJoinEvent event) {
-        if(plugin.getConfig().getBoolean("Enabled") == false) {
-            return;
-        }
+        if(!plugin.enabled()) return;
+        
         Player p = event.getPlayer();
-        boolean OPSupport = plugin.getConfig().getBoolean("Join.OPSupport.Enabled");
         boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
         boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         
         if(StreamDB.isHidden(p.getName()) && ppt) {
             event.setJoinMessage(null);
         } else {
-            if(plugin.getConfig().getBoolean("Join.HideJoinStream")) {
+            if(plugin.getConfig().getBoolean("Join.Enabled")) {
                 if(streamEnabled && ppt) {
                     return;
                 }
@@ -39,23 +37,23 @@ public class EventManager implements Listener {
                     return;
                 }
                 
+                if(plugin.getConfig().getBoolean("Join.OnlyForNewPlayers")) {
+                    if(p.hasPlayedBefore()) {
+                        return;
+                    }
+                } else if(plugin.getConfig().getBoolean("Join.OnlyForOldPlayers")) {
+                    if(!p.hasPlayedBefore()) {
+                        return;
+                    }
+                }
+                
                 if(plugin.getConfig().getBoolean("Join.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidejoin")) {
+                        if(plugin.hasPermission(p, "hidestream.hidejoin", false)) {
                             event.setJoinMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidejoin")) {
-                            event.setJoinMessage(null);
-                        }
-                    }
-                } else if(OPSupport) {
-                    if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfNotOP")) {
-                        if(!p.isOp()) {
-                            event.setJoinMessage(null);
-                        }
-                    } else if(plugin.getConfig().getBoolean("Join.OPSupport.OnlyHideIfOP")) {
-                        if(p.isOp()) {
+                        if(!plugin.hasPermission(p, "hidestream.hidejoin", false)) {
                             event.setJoinMessage(null);
                         }
                     }
@@ -68,18 +66,16 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleQuit(PlayerQuitEvent event) {
-        if(plugin.getConfig().getBoolean("Enabled") == false) {
-            return;
-        }
+        if(!plugin.enabled()) return;
+        
         Player p = event.getPlayer();
-        boolean OPSupport = plugin.getConfig().getBoolean("Quit.OPSupport.Enabled");
         boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
         boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         
         if(StreamDB.isHidden(p.getName()) && ppt) {
             event.setQuitMessage(null);
         } else {
-            if(plugin.getConfig().getBoolean("Quit.HideQuitStream")){
+            if(plugin.getConfig().getBoolean("Quit.Enabled")){
                 if(streamEnabled && ppt) {
                     return;
                 }
@@ -88,23 +84,23 @@ public class EventManager implements Listener {
                     return;
                 }
                 
+                if(plugin.getConfig().getBoolean("Quit.OnlyForNewPlayers")) {
+                    if(p.hasPlayedBefore()) {
+                        return;
+                    }
+                } else if(plugin.getConfig().getBoolean("Quit.OnlyForOldPlayers")) {
+                    if(!p.hasPlayedBefore()) {
+                        return;
+                    }
+                }
+                
                 if(plugin.getConfig().getBoolean("Quit.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidequit")) {
+                        if(plugin.hasPermission(p, "hidestream.hidequit", false)) {
                             event.setQuitMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidequit")) {
-                            event.setQuitMessage(null);
-                        }
-                    }
-                } else if(OPSupport) {
-                    if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfNotOP")) {
-                        if(!p.isOp()) {
-                            event.setQuitMessage(null);
-                        }
-                    } else if(plugin.getConfig().getBoolean("Quit.OPSupport.OnlyHideIfOP")) {
-                        if(p.isOp()) {
+                        if(!plugin.hasPermission(p, "hidestream.hidequit", false)) {
                             event.setQuitMessage(null);
                         }
                     }
@@ -117,18 +113,16 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleKick(PlayerKickEvent event) {
-        if(plugin.getConfig().getBoolean("Enabled") == false) {
-            return;
-        }
+        if(!plugin.enabled()) return;
+        
         Player p = event.getPlayer();
-        boolean OPSupport = plugin.getConfig().getBoolean("Kick.OPSupport.Enabled");
         boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
         boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         
         if(StreamDB.isHidden(p.getName()) && ppt) {
             event.setLeaveMessage(null);
         } else {
-            if(plugin.getConfig().getBoolean("Kick.HideKickStream")){
+            if(plugin.getConfig().getBoolean("Kick.Enabled")){
                 if(streamEnabled && ppt) {
                     return;
                 }
@@ -137,23 +131,23 @@ public class EventManager implements Listener {
                     return;
                 }
                 
+                if(plugin.getConfig().getBoolean("Kick.OnlyForNewPlayers")) {
+                    if(p.hasPlayedBefore()) {
+                        return;
+                    }
+                } else if(plugin.getConfig().getBoolean("Kick.OnlyForOldPlayers")) {
+                    if(!p.hasPlayedBefore()) {
+                        return;
+                    }
+                }
+                
                 if(plugin.getConfig().getBoolean("Kick.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidekick")) {
+                        if(plugin.hasPermission(p, "hidestream.hidekick", false)) {
                             event.setLeaveMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidekick")) {
-                            event.setLeaveMessage(null);
-                        }
-                    }
-                } else if(OPSupport) {
-                    if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfNotOP")) {
-                        if(!p.isOp()) {
-                            event.setLeaveMessage(null);
-                        }
-                    } else if(plugin.getConfig().getBoolean("Kick.OPSupport.OnlyHideIfOP")) {
-                        if(p.isOp()) {
+                        if(!plugin.hasPermission(p, "hidestream.hidekick", false)) {
                             event.setLeaveMessage(null);
                         }
                     }
@@ -166,18 +160,16 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleDeath(PlayerDeathEvent event) {
-        if(plugin.getConfig().getBoolean("Enabled") == false) {
-            return;
-        }
+        if(!plugin.enabled()) return;
+        
         Player p = event.getEntity();
-        boolean OPSupport = plugin.getConfig().getBoolean("Death.OPSupport.Enabled");
         boolean streamEnabled = plugin.getConfig().getBoolean("PerPlayerToggle.StreamEnabledByDefault");
         boolean ppt = plugin.getConfig().getBoolean("PerPlayerToggle.Enable");
         
         if(StreamDB.isHidden(p.getName()) && ppt) {
             event.setDeathMessage(null);
         } else {
-            if(plugin.getConfig().getBoolean("Death.HideDeathStream")){
+            if(plugin.getConfig().getBoolean("Death.Enabled")){
                 if(streamEnabled && ppt) {
                     return;
                 }
@@ -188,21 +180,11 @@ public class EventManager implements Listener {
 
                 if(plugin.getConfig().getBoolean("Death.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Death.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidedeath")) {
+                        if(plugin.hasPermission(p, "hidestream.hidedeath", false)) {
                             event.setDeathMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Death.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidedeath")) {
-                            event.setDeathMessage(null);
-                        }
-                    }
-                } else if(OPSupport) {
-                    if(plugin.getConfig().getBoolean("Death.OPSupport.OnlyHideIfNotOP")) {
-                        if(!p.isOp()) {
-                            event.setDeathMessage(null);
-                        }
-                    } else if(plugin.getConfig().getBoolean("Death.OPSupport.OnlyHideIfOP")) {
-                        if(p.isOp()) {
+                        if(!plugin.hasPermission(p, "hidestream.hidedeath", false)) {
                             event.setDeathMessage(null);
                         }
                     }

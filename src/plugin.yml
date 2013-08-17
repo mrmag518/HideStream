@@ -12,7 +12,7 @@ permissions:
   hidestream.*:
     default: op
     children:
-      hidestream.recieveUpdates: true
+      hidestream.getupdates: true
       hidestream.command.*: true
   hidestream.command.*:
     default: op

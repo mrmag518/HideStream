@@ -1,29 +1,22 @@
 package com.mrmag518.HideStream;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.permission.Permission;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class HideStream extends JavaPlugin {
     public final Logger log = Logger.getLogger("Minecraft");
-    private EventManager streamListener = null;
-    private SendUpdate sendUpdate = null;
     private FileConfiguration config;
     public static Permission perms = null;
     public double currentVersion = 0;
     public boolean updateFound = false;
+    public final String[] types = {"Join", "Quit", "Kick", "Death"};
     
     @Override
     public void onDisable() {
@@ -33,13 +26,11 @@ public class HideStream extends JavaPlugin {
     
     @Override
     public void onEnable() {
-        streamListener = new EventManager(this);
-        sendUpdate = new SendUpdate(this);
+        EventManager streamListener = new EventManager(this);
+        SendUpdate sendUpdate = new SendUpdate(this);
         currentVersion = Double.valueOf(getDescription().getVersion());
         
-        if(!getDataFolder().exists()) {
-            getDataFolder().mkdirs();
-        }
+        if(!getDataFolder().exists()) getDataFolder().mkdir();
         
         reloadConfig();
         loadConfig();
@@ -47,14 +38,10 @@ public class HideStream extends JavaPlugin {
         
         if(getConfig().getBoolean("PerPlayerToggle.Enable")) {
             StreamDB.properLoad();
-            checkStreamDB();
         }
-        
-        setupVault();
-        
         getCommand("hidestream").setExecutor(new Commands(this));
-        
         PluginDescriptionFile pdffile = getDescription();
+        
         if(getConfig().getBoolean("CheckForUpdates")) {
             log.info("[HideStream] Checking for updates ..");
             try {
@@ -85,14 +72,9 @@ public class HideStream extends JavaPlugin {
         try {
             MetricsLite metrics = new MetricsLite(this);
             metrics.start();
-        } catch (IOException e) {
-        }
+        } catch (IOException e) {}
         
         log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " enabled.");
-    }
-    
-    public void sendNoPerm(CommandSender sender) {
-        sender.sendMessage(ChatColor.RED + colorize(config.getString("NoCommandPermissionMsg")));
     }
     
     private String colorize(String s) {
@@ -106,168 +88,78 @@ public class HideStream extends JavaPlugin {
         config = getConfig();
         config.options().header("For an explanation of these configuration settings, please visit\n"
                 + "http://dev.bukkit.org/server-mods/hidestream/pages/config-explanation/ \n");
-        
+
         config.addDefault("Enabled", true);
-        config.addDefault("UseVault", false);
-        
-        checkConfig();
-        
         config.addDefault("CheckForUpdates", true);
-        config.addDefault("NoCommandPermissionMsg", "&cNo permission.");
+        config.addDefault("NoCommandPermissionMsg", "&cYou do not have permission to do that!");
         
         config.addDefault("PerPlayerToggle.Enable", false);
         config.addDefault("PerPlayerToggle.StreamEnabledByDefault", true);
         
-        config.addDefault("Join.HideJoinStream", true);
-        config.addDefault("Join.NeedsToBeOnline", 0);
-        config.addDefault("Join.Permissions.UsePermissions", false);
-        config.addDefault("Join.Permissions.HideOnlyIfHasPermission", false);
-        config.addDefault("Join.Permissions.HideOnlyIfWithoutPermission", false);
-        config.addDefault("Join.OPSupport.Enabled", false);
-        config.addDefault("Join.OPSupport.OnlyHideIfNotOP", false);
-        config.addDefault("Join.OPSupport.OnlyHideIfOP", false);
+        for(String s : types) {
+            config.addDefault(s + ".Enabled", true);
+            config.addDefault(s + ".NeedsToBeOnline", 0);
+            if(!s.equalsIgnoreCase("death")) {
+                config.addDefault(s + ".OnlyForNewPlayers", false);
+                config.addDefault(s + ".OnlyForOldPlayers", false);
+            }
+            config.addDefault(s + ".Permissions.UsePermissions", false);
+            config.addDefault(s + ".Permissions.HideOnlyIfHasPermission", false);
+            config.addDefault(s + ".Permissions.HideOnlyIfWithoutPermission", false);
+        }
         
-        config.addDefault("Quit.HideQuitStream", true);
-        config.addDefault("Quit.NeedsToBeOnline", 0);
-        config.addDefault("Quit.Permissions.UsePermissions", false);
-        config.addDefault("Quit.Permissions.HideOnlyIfHasPermission", false);
-        config.addDefault("Quit.Permissions.HideOnlyIfWithoutPermission", false);
-        config.addDefault("Quit.OPSupport.Enabled", false);
-        config.addDefault("Quit.OPSupport.OnlyHideIfNotOP", false);
-        config.addDefault("Quit.OPSupport.OnlyHideIfOP", false);
-        
-        config.addDefault("Kick.HideKickStream", true);
-        config.addDefault("Kick.NeedsToBeOnline", 0);
-        config.addDefault("Kick.Permissions.UsePermissions", false);
-        config.addDefault("Kick.Permissions.HideOnlyIfHasPermission", false);
-        config.addDefault("Kick.Permissions.HideOnlyIfWithoutPermission", false);
-        config.addDefault("Kick.OPSupport.Enabled", false);
-        config.addDefault("Kick.OPSupport.OnlyHideIfNotOP", false);
-        config.addDefault("Kick.OPSupport.OnlyHideIfOP", false);
-        
-        config.addDefault("Death.HideDeathStream", false);
-        config.addDefault("Death.NeedsToBeOnline", 0);
-        config.addDefault("Death.Permissions.UsePermissions", false);
-        config.addDefault("Death.Permissions.HideOnlyIfHasPermission", false);
-        config.addDefault("Death.Permissions.HideOnlyIfWithoutPermission", false);
-        config.addDefault("Death.OPSupport.Enabled", false);
-        config.addDefault("Death.OPSupport.OnlyHideIfNotOP", false);
-        config.addDefault("Death.OPSupport.OnlyHideIfOP", false);
-        
+        checkConfig();
         getConfig().options().copyDefaults(true);
         saveConfig();
         log.info("[HideStream] Loaded configuration file.");
     }
     
-    /**
-     * Checks outdated settings, and converts them if found.
-     */
     private void checkConfig() {
         config = getConfig();
         
+        if(config.get("UseVault") != null) {
+            config.set("UseVault", null);
+        }
+        
         if(config.get("PerPlayerToggle.AllowToEnable") != null) {
             config.set("PerPlayerToggle.AllowToEnable", null);
-            saveConfig();
         }
         
         if(config.get("DebugMode") != null) {
             config.set("DebugMode", null);
-            saveConfig();
         }
-    }
-    
-    /**
-     * 2.x -> 3.x convertion.
-     */
-    private void checkStreamDB() {
-        File f = new File("plugins/HideStream/streamDB.yml");
         
-        if(f.exists()) {
-            boolean isOld = false;
-            
-            for(OfflinePlayer op : Bukkit.getOfflinePlayers()) {
-                if(StreamDB.getStreamDB().get(op.getName() + ".hidden") != null) {
-                    isOld = true;
-                    break;
-                }
+        for(String s : types) {
+            if(config.get(s + ".OPSupport.Enabled") != null) {
+                config.set(s + ".OPSupport.Enabled", null);
             }
             
-            if(isOld) {
-                long start = System.currentTimeMillis();
-                log.info("[HideStream] Detected old version of streamDB.yml!");
-                log.info("[HideStream] Will convert to new format.");
-                
-                for(OfflinePlayer op : Bukkit.getOfflinePlayers()) {
-                    if(StreamDB.getStreamDB().get(op.getName() + ".hidden") != null) {
-                        boolean prevOpt = StreamDB.getStreamDB().getBoolean(op.getName() + ".hidden");
-                        StreamDB.getStreamDB().set(op.getName(), prevOpt);
-                        StreamDB.getStreamDB().set(op.getName() + ".hidden", null);
-                    }
-                }
-                StreamDB.save();
-                
-                long end = System.currentTimeMillis();
-                long diff = end - start;
-                log.info("[HideStream] Convertion finished! Took " + diff + "ms.");
+            if(config.get(s + ".OPSupport.OnlyHideIfNotOP") != null) {
+                config.set(s + ".OPSupport.OnlyHideIfNotOP", null);
+            }
+            
+            if(config.get(s + ".OPSupport.OnlyHideIfOP") != null) {
+                config.set(s + ".OPSupport.OnlyHideIfOP", null);
+            }
+            
+            if(config.get(s + ".Hide" + s + "Stream") != null) {
+                config.set(s + ".Enabled", config.getBoolean(s + ".Hide" + s + "Stream"));
+                config.set(s + ".Hide" + s + "Stream", null);
             }
         }
+        
+        saveConfig();
     }
     
-    private void setupVault() {
-        if(getConfig().getBoolean("UseVault")) {
-            if(getServer().getPluginManager().getPlugin("Vault") != null) {
-                setupPermissions();
-            } else {
-                log.severe("[HideStream] Vault.jar was NOT found in your plugins folder!");
-                log.severe("[HideStream] You need to have Vault.jar enabled for Vault support to work!");
-                log.warning("[HideStream] Setting UseVault in your config.yml to false ..");
-                getConfig().set("UseVault", false);
-                saveConfig();
-            }
+    public boolean hasPermission(Player player, String permission, boolean notify) {
+        if(!player.hasPermission(permission)) {
+            if(notify) player.sendMessage(colorize(config.getString("NoCommandPermissionMsg")));
+            return false;
         }
+        return true;
     }
     
-    private void setupPermissions() {
-        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-        perms = rsp.getProvider();
-        if(perms != null) {
-            log.info("[HideStream] Hooked to permissions plugin: " + perms.getName());
-        } else {
-            log.warning("[HideStream] No (vault) supported permissions plugin found!");
-            log.warning("[HideStream] Will attempt to use the native bukkit permissions system.");
-            log.warning("[HideStream] Setting UseVault in your config.yml to false ..");
-            getConfig().set("UseVault", false);
-            saveConfig();
-        }
-    }
-    
-    public boolean hasPermission(CommandSender sender, String permission) {
-        if(getConfig().getBoolean("UseVault")) {
-            if(perms.has(sender, permission)) {
-                return true;
-            } else {
-                sendNoPerm(sender);
-            }
-        } else {
-            if(sender.hasPermission(permission)) {
-                return true;
-            } else {
-                sendNoPerm(sender);
-            }
-        }
-        return false;
-    }
-    
-    public boolean hasPermission(Player p, String permission) {
-        if(getConfig().getBoolean("UseVault")) {
-            if(perms.has(p, permission)) {
-                return true;
-            }
-        } else {
-            if(p.hasPermission(permission)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean enabled() {
+        return config.getBoolean("Enabled");
     }
 }

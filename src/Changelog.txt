@@ -1,6 +1,15 @@
 Version 3.2
 * Updated metrics to R7.
-* 
+* Removed streamDB.yml 2.x -> 3.x convertion.
+* Dropped Vault permissions support as it is useless, the standard Bukkit system does exactly the same.
+* Changed the default permission message in the config.
+* Dropped OPSupport as the permissions system defaults to OP, which makes OPSupport useless.
+* The configuration has been slightly changed and optimized. Any changes will convert automatically.
+* Added two new settings for each stream category except Death.
+** 'xx.OnlyForNewPlayers', if enabled, the stream handling will only be activated for new players.
+** 'xx.OnlyForOldPlayers', if enabled, the stream handling will only be activated for old players.
+** PerPlayerToggle has higher priority than these settings.
+* Improved the invalid command message.
 
 Version 3.1
 * Removed all debug content.
