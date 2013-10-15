@@ -1,3 +1,11 @@
+Version 3.3
+* The updater has been given a major overhaul.
+* Fixed permissions not working correctly if the player was OP and x.HideOnlyIfHasPermission was enabled.
+** Same applies for x.HideOnlyIfWithoutPermission.
+* Fixed command list formatting in console.
+* Overall code cleanup and refactoring.
+* Supports 1.6.4
+
 Version 3.2
 * Updated metrics to R7.
 * Removed streamDB.yml 2.x -> 3.x convertion.

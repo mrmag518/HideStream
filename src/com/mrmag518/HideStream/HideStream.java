@@ -1,9 +1,9 @@
 package com.mrmag518.HideStream;
 
+import com.mrmag518.HideStream.Util.Log;
+import com.mrmag518.HideStream.Util.MetricsLite;
+import com.mrmag518.HideStream.Util.Updater;
 import java.io.IOException;
-import java.util.logging.Logger;
-
-import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -11,23 +11,21 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class HideStream extends JavaPlugin {
-    public final Logger log = Logger.getLogger("Minecraft");
     private FileConfiguration config;
-    public static Permission perms = null;
     public double currentVersion = 0;
     public boolean updateFound = false;
     public final String[] types = {"Join", "Quit", "Kick", "Death"};
+    public Updater updater = null;
     
     @Override
     public void onDisable() {
         PluginDescriptionFile pdffile = getDescription();
-        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " disabled.");
+        Log.info("Version " + pdffile.getVersion() + " disabled.");
     }
     
     @Override
     public void onEnable() {
-        EventManager streamListener = new EventManager(this);
-        SendUpdate sendUpdate = new SendUpdate(this);
+        EventManager manager = new EventManager(this);
         currentVersion = Double.valueOf(getDescription().getVersion());
         
         if(!getDataFolder().exists()) getDataFolder().mkdir();
@@ -36,36 +34,39 @@ public class HideStream extends JavaPlugin {
         loadConfig();
         reloadConfig();
         
-        if(getConfig().getBoolean("PerPlayerToggle.Enable")) {
-            StreamDB.properLoad();
-        }
+        if(getConfig().getBoolean("PerPlayerToggle.Enable")) StreamDB.properLoad();
+        
         getCommand("hidestream").setExecutor(new Commands(this));
         PluginDescriptionFile pdffile = getDescription();
         
         if(getConfig().getBoolean("CheckForUpdates")) {
-            log.info("[HideStream] Checking for updates ..");
+            Log.info("Running update checker ..");
+            
             try {
-                Updater updater = new Updater(this, "hidestream", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
-
+                updater = new Updater(this, 37123, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+                
                 Updater.UpdateResult result = updater.getResult();
                 switch(result) {
                     case NO_UPDATE:
-                        log.info("No update was found.");
+                        Log.info("No update was found.");
                         break;
                     case FAIL_DBO:
-                        log.warning("Failed to contact dev.bukkkit.org!");
+                        Log.warning("Failed to contact dev.bukkkit.org!");
                         break;
                     case UPDATE_AVAILABLE:
                         updateFound = true;
-                        log.info("########## HideStream update ##########");
-                        log.info("A new version of HideStream was found!");
-                        log.info("Version found: " + updater.getLatestVersionString());
-                        log.info("Version running: " + pdffile.getFullName());
-                        log.info("#####################################");
+                        Log.info(" --- ");
+                        Log.info("A new version has been found! (" + updater.getLatestName() + ")");
+                        Log.info("You are currently running " + pdffile.getFullName());
+                        Log.info(" --- ");
                         break;
+                    case DISABLED:
+                        Log.info("Updater checker has been disabled in the updater config.");
+                    case FAIL_APIKEY:
+                        Log.warning("The API key you have provided is incorrect!");
                 }
             } catch(RuntimeException re) {
-                log.warning("[HideStream] Failed to establish a connection to dev.bukkit.org!");
+                Log.warning("Failed to establish a connection to dev.bukkit.org!");
             }
         }
         
@@ -73,14 +74,11 @@ public class HideStream extends JavaPlugin {
             MetricsLite metrics = new MetricsLite(this);
             metrics.start();
         } catch (IOException e) {}
-        
-        log.info("[" + pdffile.getName() + "]" + " v" + pdffile.getVersion() + " enabled.");
+        Log.info("Version " + pdffile.getVersion() + " enabled.");
     }
     
     private String colorize(String s) {
-        if (s == null) {
-            return null;
-        }
+        if(s == null) return "";
         return s.replaceAll("&([0-9a-f])", "\u00A7$1");
     }
     
@@ -111,7 +109,7 @@ public class HideStream extends JavaPlugin {
         checkConfig();
         getConfig().options().copyDefaults(true);
         saveConfig();
-        log.info("[HideStream] Loaded configuration file.");
+        Log.info("Loaded configuration file.");
     }
     
     private void checkConfig() {
@@ -147,7 +145,6 @@ public class HideStream extends JavaPlugin {
                 config.set(s + ".Hide" + s + "Stream", null);
             }
         }
-        
         saveConfig();
     }
     

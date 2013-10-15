@@ -25,8 +25,7 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
-package com.mrmag518.HideStream;
+package com.mrmag518.HideStream.Util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -56,52 +55,42 @@ public class MetricsLite {
      * The current revision number
      */
     private final static int REVISION = 7;
-
     /**
      * The base url of the metrics domain
      */
     private static final String BASE_URL = "http://report.mcstats.org";
-
     /**
      * The url used to report a server's status
      */
     private static final String REPORT_URL = "/plugin/%s";
-
     /**
      * Interval of time to ping (in minutes)
      */
     private final static int PING_INTERVAL = 15;
-
     /**
      * The plugin this metrics submits for
      */
     private final Plugin plugin;
-
     /**
      * The plugin configuration file
      */
     private final YamlConfiguration configuration;
-
     /**
      * The plugin configuration file
      */
     private final File configurationFile;
-
     /**
      * Unique server id
      */
     private final String guid;
-
     /**
      * Debug mode
      */
     private final boolean debug;
-
     /**
      * Lock for synchronization
      */
     private final Object optOutLock = new Object();
-
     /**
      * Id of the scheduled task
      */
@@ -135,9 +124,8 @@ public class MetricsLite {
     }
 
     /**
-     * Start measuring statistics. This will immediately create an async repeating task as the plugin and send
-     * the initial data to the metrics backend, and then after that it will post in increments of
-     * PING_INTERVAL * 1200 ticks.
+     * Start measuring statistics. This will immediately create an async repeating task as the plugin and send the initial data to the metrics
+     * backend, and then after that it will post in increments of PING_INTERVAL * 1200 ticks.
      *
      * @return True if statistics measuring is running, otherwise false.
      */
@@ -155,7 +143,6 @@ public class MetricsLite {
 
             // Begin hitting the server with glorious data
             task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
-
                 private boolean firstPost = true;
 
                 public void run() {
@@ -397,9 +384,11 @@ public class MetricsLite {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (gzos != null) try {
-                gzos.close();
-            } catch (IOException ignore) {
+            if (gzos != null) {
+                try {
+                    gzos.close();
+                } catch (IOException ignore) {
+                }
             }
         }
 
@@ -509,5 +498,4 @@ public class MetricsLite {
     private static String urlEncode(final String text) throws UnsupportedEncodingException {
         return URLEncoder.encode(text, "UTF-8");
     }
-
 }

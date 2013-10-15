@@ -1,8 +1,8 @@
 author: mrmag518
 main: com.mrmag518.HideStream.HideStream
-version: '3.2'
+version: '3.3'
 name: HideStream
-description: "Hide spam output such as Join/Leave messages."
+description: "Hide spam output such as join & leave messages."
 commands:
   hidestream:
     description: Main command for HideStream.

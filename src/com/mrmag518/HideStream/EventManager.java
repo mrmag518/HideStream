@@ -17,6 +17,21 @@ public class EventManager implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
     
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void handleUpdate(PlayerJoinEvent event) {
+        final Player p = event.getPlayer();
+        
+        if(p.hasPermission("hidestream.getupdates") && plugin.updateFound) {
+            Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    p.sendMessage("§f[§3HideStream§f] §e" + plugin.updater.getLatestName() + " is now available!");
+                    p.sendMessage("§f[§3HideStream§f] §e§ohttp://dev.bukkit.org/bukkit-plugins/hidestream/");
+                }
+            }, 100);
+        }
+    }
+    
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleJoin(PlayerJoinEvent event) {
         if(!plugin.enabled()) return;
@@ -49,11 +64,11 @@ public class EventManager implements Listener {
                 
                 if(plugin.getConfig().getBoolean("Join.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidejoin", false)) {
+                        if(plugin.hasPermission(p, "hidestream.hidejoin", false) || p.isOp()) {
                             event.setJoinMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Join.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidejoin", false)) {
+                        if(!plugin.hasPermission(p, "hidestream.hidejoin", false) && !p.isOp()) {
                             event.setJoinMessage(null);
                         }
                     }
@@ -96,11 +111,11 @@ public class EventManager implements Listener {
                 
                 if(plugin.getConfig().getBoolean("Quit.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidequit", false)) {
+                        if(plugin.hasPermission(p, "hidestream.hidequit", false) || p.isOp()) {
                             event.setQuitMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Quit.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidequit", false)) {
+                        if(!plugin.hasPermission(p, "hidestream.hidequit", false) && !p.isOp()) {
                             event.setQuitMessage(null);
                         }
                     }
@@ -143,11 +158,11 @@ public class EventManager implements Listener {
                 
                 if(plugin.getConfig().getBoolean("Kick.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidekick", false)) {
+                        if(plugin.hasPermission(p, "hidestream.hidekick", false) || p.isOp()) {
                             event.setLeaveMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Kick.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidekick", false)) {
+                        if(!plugin.hasPermission(p, "hidestream.hidekick", false) && !p.isOp()) {
                             event.setLeaveMessage(null);
                         }
                     }
@@ -180,11 +195,11 @@ public class EventManager implements Listener {
 
                 if(plugin.getConfig().getBoolean("Death.Permissions.UsePermissions")) {
                     if(plugin.getConfig().getBoolean("Death.Permissions.HideOnlyIfHasPermission")) {
-                        if(plugin.hasPermission(p, "hidestream.hidedeath", false)) {
+                        if(plugin.hasPermission(p, "hidestream.hidedeath", false) || p.isOp()) {
                             event.setDeathMessage(null);
                         }
                     } else if(plugin.getConfig().getBoolean("Death.Permissions.HideOnlyIfWithoutPermission")) {
-                        if(!plugin.hasPermission(p, "hidestream.hidedeath", false)) {
+                        if(!plugin.hasPermission(p, "hidestream.hidedeath", false) && !p.isOp()) {
                             event.setDeathMessage(null);
                         }
                     }

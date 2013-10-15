@@ -5,13 +5,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class StreamDB {
-    private static final HideStream plugin = (HideStream) Bukkit.getPluginManager().getPlugin("HideStream");
     public static FileConfiguration streamDB = null;
     public static File streamDBFile = null;
     
