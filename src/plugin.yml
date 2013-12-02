@@ -1,6 +1,6 @@
 author: mrmag518
-main: com.mrmag518.HideStream.HideStream
-version: '3.3'
+main: com.mrmag518.HideStream.Main
+version: '3.4'
 name: HideStream
 description: "Hide spam output such as join & leave messages."
 commands:
@@ -22,6 +22,7 @@ permissions:
       hidestream.command.enable: true
       hidestream.command.disable: true
       hidestream.command.hideme: true
+      hidestream.command.hideme.others: true
   hidestream.hidejoin:
     default: false
   hidestream.hidequit:

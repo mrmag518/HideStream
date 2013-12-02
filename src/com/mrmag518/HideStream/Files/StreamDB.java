@@ -1,4 +1,4 @@
-package com.mrmag518.HideStream;
+package com.mrmag518.HideStream.Files;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class StreamDB {
     public static FileConfiguration streamDB = null;
     public static File streamDBFile = null;
     
-    public static void properLoad() {
+    public static void init() {
         reload();
         load();
         reload();
@@ -27,7 +27,7 @@ public class StreamDB {
     
     public static void reload() {
         if (streamDBFile == null) {
-            streamDBFile = new File("plugins/HideStream/streamDB.yml");
+            streamDBFile = new File("plugins" + File.separator + "HideStream" + File.separator + "streamDB.yml");
         }
         streamDB = YamlConfiguration.loadConfiguration(streamDBFile);
     }
@@ -50,14 +50,14 @@ public class StreamDB {
         }
     }
     
-    public static void setHidden(String victim, boolean value) {
-        victim = victim.toLowerCase();
-        getStreamDB().set(victim, value);
+    public static void setHidden(String target, boolean value) {
+        target = target.toLowerCase();
+        getStreamDB().set(target, value);
         save();
     }
     
-    public static boolean isHidden(String victim) {
-        victim = victim.toLowerCase();
-        return getStreamDB().getBoolean(victim);
+    public static boolean isHidden(String target) {
+        target = target.toLowerCase();
+        return getStreamDB().getBoolean(target);
     }
 }

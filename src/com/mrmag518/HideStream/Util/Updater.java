@@ -15,17 +15,17 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 public class Updater {
-    private Plugin plugin;
-    private UpdateType type;
+    private final Plugin plugin;
+    private final UpdateType type;
     private String versionName;
     private String versionLink;
     private String versionType;
     private String versionGameVersion;
 
-    private boolean announce;
+    private final boolean announce;
 
     private URL url;
-    private File file;
+    private final File file;
     private Thread thread;
 
     private int id = -1;
@@ -39,8 +39,8 @@ public class Updater {
 
     private static final String[] NO_UPDATE_TAG = { "-DEV", "-PRE", "-SNAPSHOT" };
     private static final int BYTE_SIZE = 1024;
-    private YamlConfiguration config;
-    private String updateFolder;
+    private final YamlConfiguration config;
+    private final String updateFolder;
     private Updater.UpdateResult result = Updater.UpdateResult.SUCCESS;
     
     public enum UpdateResult {
