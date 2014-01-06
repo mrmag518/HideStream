@@ -1,48 +1,51 @@
 author: mrmag518
 main: com.mrmag518.HideStream.Main
-version: '3.4'
+version: '3.5'
 name: HideStream
 description: "Hide spam output such as join & leave messages."
 commands:
-  hidestream:
-    description: Main command for HideStream.
-    usage: /<command> [args]
-    aliases: [hs]
+    hidestream:
+        description: Parent command for all HideStream commands.
+        usage: /<command> [args]
+        aliases: [hs]
 permissions:
-  hidestream.*:
-    default: op
-    children:
-      hidestream.getupdates: true
-      hidestream.command.*: true
-  hidestream.command.*:
-    default: op
-    children:
-      hidestream.command.list: true
-      hidestream.command.reload: true
-      hidestream.command.enable: true
-      hidestream.command.disable: true
-      hidestream.command.hideme: true
-      hidestream.command.hideme.others: true
-  hidestream.hidejoin:
-    default: false
-  hidestream.hidequit:
-    default: false
-  hidestream.hidekick:
-    default: false
-  hidestream.hidedeath:
-    default: false
-  hidestream.getupdates:
-    default: op
-  hidestream.command.list:
-    default: true
-  hidestream.command.reload:
-    default: op
-  hidestream.command.enable:
-    default: op
-  hidestream.command.disable:
-    default: op
-  hidestream.command.hideme:
-    default: op
-  hidestream.command.hideme.others:
-    default: op
+    hidestream.*:
+        default: op
+        children:
+            hidestream.getupdates: true
+            hidestream.command.*: true
+    hidestream.command.*:
+        default: op
+        children:
+            hidestream.command.list: true
+            hidestream.command.reload: true
+            hidestream.command.enable: true
+            hidestream.command.disable: true
+            hidestream.command.hideme: true
+            hidestream.command.hideme.others: true
+            hidestream.command.update: true
+    hidestream.hidejoin:
+        default: false
+    hidestream.hidequit:
+        default: false
+    hidestream.hidekick:
+        default: false
+    hidestream.hidedeath:
+        default: false
+    hidestream.getupdates:
+        default: op
+    hidestream.command.list:
+        default: true
+    hidestream.command.reload:
+        default: op
+    hidestream.command.enable:
+        default: op
+    hidestream.command.disable:
+        default: op
+    hidestream.command.hideme:
+        default: op
+    hidestream.command.hideme.others:
+        default: op
+    hidestream.command.update:
+        default: op
   

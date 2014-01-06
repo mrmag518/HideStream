@@ -2,6 +2,7 @@ package com.mrmag518.HideStream;
 
 import com.mrmag518.HideStream.Files.Config;
 import com.mrmag518.HideStream.Files.StreamDB;
+import com.mrmag518.HideStream.Util.Updater;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,19 +10,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Commands implements CommandExecutor {
-    public static Main plugin;
-    public Commands(Main instance){
-        plugin = instance;
-    }
-    private final String PREFIX = "§f[§3HideStream§f] ";
-    
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String l, String[] args){
+    public boolean onCommand(final CommandSender sender, Command cmd, String l, String[] args){
         if(cmd.getName().equalsIgnoreCase("hidestream")) {
             if(sender instanceof Player) {
                 if(args.length == 0) {
                     if(sender.hasPermission("hidestream.command.list")) {
-                        sender.sendMessage("------------------- §eHideStream v" + plugin.currentVersion + "§f -------------------");
+                        sender.sendMessage("------------------- §eHideStream v" + Main.instance.getDescription().getFullName() + "§f -------------------");
                         sender.sendMessage("§e/hs reload");
                         sender.sendMessage(" §7-> §3Reload the configuration file.");
                         sender.sendMessage("§e/hs enable");
@@ -30,6 +25,8 @@ public class Commands implements CommandExecutor {
                         sender.sendMessage(" §7-> §3Disable HideStream.");
                         sender.sendMessage("§e/hs toggle [player]");
                         sender.sendMessage(" §7-> §3Toggle stream for you or someone else.");
+                        sender.sendMessage("§e/hs update");
+                        sender.sendMessage(" §7-> §3Auto/force update HideStream.");
                         sender.sendMessage("-----------------------------------------------------");
                     } else {
                         sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
@@ -67,13 +64,43 @@ public class Commands implements CommandExecutor {
                                 sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
                             }
                         }
+                    } else if(args[0].equalsIgnoreCase("update")) {
+                        if(sender.hasPermission("hidestream.command.update")) {
+                            if(Config.UPDATE_CHECKING) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        sender.sendMessage(Main.prefix + "§eRunning updater ..");
+                                        
+                                        Updater updater = new Updater(Main.instance, 37123, Main.instance.getDataFile(), Updater.UpdateType.NO_VERSION_CHECK, true);
+                                        
+                                        switch(updater.getResult()) {
+                                            case FAIL_DBO: 
+                                                sender.sendMessage(Main.prefix + "§cUpdater failed! (Could not contact dev.bukkit.org)"); 
+                                                break;
+                                            case FAIL_DOWNLOAD: 
+                                                sender.sendMessage(Main.prefix + "§cUpdater failed! (Failed to download file)"); 
+                                                break;
+                                            case SUCCESS:
+                                                sender.sendMessage(Main.prefix + "§eDownload complete! (§7" + updater.getLatestName() + "§e)");
+                                                sender.sendMessage(Main.prefix + "§eRestart the server to apply the update.");
+                                                break;
+                                        }
+                                    }
+                                }).start();
+                            } else {
+                                sender.sendMessage(Main.prefix + "§cThe updater has not been enabled in the config!");
+                            }
+                        } else {
+                            sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
+                        }
                     } else {
-                        sender.sendMessage(PREFIX + "§cUnknown command. Run '§7/hidestream§c' for help.");
+                        sender.sendMessage(Main.prefix + "§cUnknown command. Run §7/hidestream§c for help.");
                     }
                 }
             } else {
                 if(args.length == 0) {
-                    sender.sendMessage("------------------- HideStream v" + plugin.currentVersion + " -------------------");
+                    sender.sendMessage("------------------- HideStream v" + Main.instance.getDescription().getFullName() + " -------------------");
                     sender.sendMessage("/hs reload");
                     sender.sendMessage(" -> Reload the configuration file.");
                     sender.sendMessage("/hs enable");
@@ -82,6 +109,8 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(" -> Disable HideStream.");
                     sender.sendMessage("/hs toggle [player]");
                     sender.sendMessage(" -> Toggle stream for you or someone else.");
+                    sender.sendMessage("/hs update");
+                    sender.sendMessage(" -> Auto/force update HideStream.");
                     sender.sendMessage("-----------------------------------------------------");
                 } else if(args.length > 0) {
                     if(args[0].equalsIgnoreCase("reload")) {
@@ -92,11 +121,38 @@ public class Commands implements CommandExecutor {
                         disable(sender);
                     } else if(args[0].equalsIgnoreCase("toggle")) {
                         if(args.length == 1) {
-                            sender.sendMessage("You can't toggle console! Use '/hs toggle <player>'");
+                            sender.sendMessage("You can't toggle the console! Use '/hs toggle <player>'");
                         } else if(args.length == 2){
                             toggleHidden(sender, args[1]);
                         }
-                    } else {
+                    } else if(args[0].equalsIgnoreCase("update")) {
+                        if(Config.UPDATE_CHECKING) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    sender.sendMessage("Running updater ..");
+                                    
+                                    Updater updater = new Updater(Main.instance, 37123, Main.instance.getDataFile(), Updater.UpdateType.NO_VERSION_CHECK, true);
+                                    
+                                    switch(updater.getResult()) {
+                                        case FAIL_DBO: 
+                                            sender.sendMessage("Updater failed! (Could not contact dev.bukkit.org)"); 
+                                            break;
+                                        case FAIL_DOWNLOAD: 
+                                            sender.sendMessage("Updater failed! (Failed to download file)"); 
+                                            break;
+                                        case SUCCESS:
+                                            sender.sendMessage("Download complete! (" + updater.getLatestName() + ")");
+                                            sender.sendMessage("Restart the server to apply the update.");
+                                            break;
+                                    }
+                                }
+                            }).start();
+                        } else {
+                            sender.sendMessage("The updater has not been enabled in the config!");
+                        }
+                    }
+                    else {
                         sender.sendMessage("Unknown command. Run '/hidestream' for help.");
                     }
                 }
@@ -107,32 +163,32 @@ public class Commands implements CommandExecutor {
     }
     
     private void reload(CommandSender sender) {
-        if(!plugin.getDataFolder().exists()) plugin.getDataFolder().mkdir();
+        if(!Main.instance.getDataFolder().exists()) Main.instance.getDataFolder().mkdir();
         Config.init();
         if(Config.PPT_ENABLED) StreamDB.init();
         
-        sender.sendMessage(PREFIX + "§eConfiguration file reloaded!");
+        sender.sendMessage(Main.prefix + "§eConfiguration file reloaded!");
     }
     
     private void enable(CommandSender sender) {
         if(Config.ENABLED) {
-            sender.sendMessage(PREFIX + "§eHideStream is already enabled!");
+            sender.sendMessage(Main.prefix + "§eHideStream is already enabled!");
         } else {
             Config.getConfig().set("Enabled", true);
             Config.save();
             Config.ENABLED = true;
-            sender.sendMessage(PREFIX + "§eEnabled HideStream!");
+            sender.sendMessage(Main.prefix + "§eEnabled HideStream!");
         }
     }
     
     private void disable(CommandSender sender) {
         if(Config.ENABLED == false) {
-            sender.sendMessage(PREFIX + "§eHideStream is already disabled!");
+            sender.sendMessage(Main.prefix + "§eHideStream is already disabled!");
         } else {
             Config.getConfig().set("Enabled", false);
             Config.save();
             Config.ENABLED = false;
-            sender.sendMessage(PREFIX + "§eDisabled HideStream!");
+            sender.sendMessage(Main.prefix + "§eDisabled HideStream!");
         }
     }
     
@@ -144,21 +200,21 @@ public class Commands implements CommandExecutor {
                 StreamDB.setHidden(target, false);
                 
                 if(sender.getName().equalsIgnoreCase(target)) {
-                    sender.sendMessage(PREFIX + "§eStream output will now be shown for you.");
+                    sender.sendMessage(Main.prefix + "§eStream output will now be shown for you.");
                 } else {
-                    sender.sendMessage(PREFIX + "§eStream output will now be shown for " + target + ".");
+                    sender.sendMessage(Main.prefix + "§eStream output will now be shown for " + target + ".");
                 }
             } else {
                 StreamDB.setHidden(target, true);
                 
                 if(sender.getName().equalsIgnoreCase(target)) {
-                    sender.sendMessage(PREFIX + "§eStream output will now be hidden for you.");
+                    sender.sendMessage(Main.prefix + "§eStream output will now be hidden for you.");
                 } else {
-                    sender.sendMessage(PREFIX + "§eStream output will now be hidden for " + target + ".");
+                    sender.sendMessage(Main.prefix + "§eStream output will now be hidden for " + target + ".");
                 }
             }
         } else {
-            sender.sendMessage(PREFIX + "§eThis feature has not been enabled in the configuration file!");
+            sender.sendMessage(Main.prefix + "§eThis feature has not been enabled in the configuration file!");
         }
     }
 }

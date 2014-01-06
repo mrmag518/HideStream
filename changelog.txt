@@ -1,3 +1,12 @@
+Version 3.5
+* More performance improvements.
+** Caches often used configuration options.
+* Code improvements and cleanup.
+* All stream types now respects the individual stream types' enabled state no matter if per-player toggle is enabled or not.
+* Added the command, /hs update
+** This command will automatically update HideStream for you. If you already have the latest version, if will force-update it.
+** The server will have to be restarted after the update has been downloaded.
+
 Version 3.4
 * Removed configuration convertion from v3.2 -> 3.x
 * Performance has been improved.

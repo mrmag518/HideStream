@@ -6,15 +6,15 @@ import com.mrmag518.HideStream.Util.Log;
 import com.mrmag518.HideStream.Util.MetricsLite;
 import com.mrmag518.HideStream.Util.Updater;
 
+import java.io.File;
 import java.io.IOException;
 
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
-    public double currentVersion;
-    public boolean updateFound = false;
-    public Updater updater = null;
+    public static String latestUpdate = "null";
+    public static String prefix = "§f[§3HideStream§f] ";
+    public static Main instance = null;
     
     @Override
     public void onDisable() {
@@ -23,27 +23,25 @@ public class Main extends JavaPlugin {
     
     @Override
     public void onEnable() {
-        EventManager manager = new EventManager(this);
-        final PluginDescriptionFile pdf = getDescription();
-        currentVersion = Double.valueOf(pdf.getVersion());
+        instance = this;
+        new EventManager().register();
         if(!getDataFolder().exists()) getDataFolder().mkdir();
         Config.init();
         if(Config.PPT_ENABLED) StreamDB.init();
-        getCommand("hidestream").setExecutor(new Commands(this));
+        getCommand("hidestream").setExecutor(new Commands());
         
         if(Config.UPDATE_CHECKING) {
-            Thread t = new Thread(new Runnable() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    updateCheck(pdf);
+                    updateCheck();
                 }
-            });
-            t.start();
+            }).start();
             
             getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
                 @Override
                 public void run() {
-                    updateCheck(pdf);
+                    updateCheck();
                 }
             }, 20*60*60*4, 20*60*60*4);
         }
@@ -52,14 +50,18 @@ public class Main extends JavaPlugin {
             MetricsLite metrics = new MetricsLite(this);
             metrics.start();
         } catch (IOException e) {}
-        Log.info("Version " + pdf.getVersion() + " enabled.");
+        Log.info("Version " + getDescription().getVersion() + " enabled.");
     }
     
-    private void updateCheck(PluginDescriptionFile pdf) {
-        Log.info("Running update checker ..");
+    public File getDataFile() {
+        return getFile();
+    }
+    
+    private void updateCheck() {
+        Log.info("Running updater ..");
         
         try {
-            updater = new Updater(this, 37123, getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+            Updater updater = new Updater(this, 37123, getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
 
             Updater.UpdateResult result = updater.getResult();
             switch(result) {
@@ -70,18 +72,20 @@ public class Main extends JavaPlugin {
                     Log.warning("Failed to contact dev.bukkkit.org!");
                     break;
                 case UPDATE_AVAILABLE:
-                    updateFound = true;
-                    Log.info(" --- ");
-                    Log.info("A new version has been found! (" + updater.getLatestName() + ")");
-                    Log.info("You are currently running " + pdf.getFullName());
-                    Log.info(" --- ");
+                    latestUpdate = updater.getLatestName();
+                    Log.info(" ------------- ");
+                    Log.info("A new version has been found! (" + latestUpdate + ")");
+                    Log.info("You are currently running " + getDescription().getFullName());
+                    Log.info(" ------------- ");
                     break;
                 case DISABLED:
                     Log.info("Updater checker has been disabled in the updater config.");
+                    break;
                 case FAIL_APIKEY:
                     Log.warning("The API key you have provided is incorrect!");
+                    break;
             }
-        } catch(RuntimeException re) {
+        } catch(RuntimeException e) {
             Log.warning("Failed to establish a connection to dev.bukkit.org!");
         }
     }

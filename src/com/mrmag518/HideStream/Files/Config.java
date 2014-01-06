@@ -5,24 +5,35 @@ import com.mrmag518.HideStream.Util.Log;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class Config {
     private static FileConfiguration config = null;
     private static File configFile = null;
-    private static final Main plugin = (Main)Bukkit.getPluginManager().getPlugin("HideStream");
     
     public static boolean   ENABLED;
     public static boolean   UPDATE_CHECKING;
-    public static String    NO_ACCESS_MESSAGE;
     public static boolean   PPT_ENABLED;
     public static boolean   PPT_STREAM_ENABLED_BY_DEF;
+    public static String    NO_ACCESS_MESSAGE;
+    
+    public static boolean   JOIN_HIDE;
+    public static boolean   JOIN_USE_PERMS;
+    public static int       JOIN_ONLINE_AMOUNT;
+    
+    public static boolean   QUIT_HIDE;
+    public static boolean   QUIT_USE_PERMS;
+    public static int       QUIT_ONLINE_AMOUNT;
+    
+    public static boolean   KICK_HIDE;
+    public static boolean   KICK_USE_PERMS;
+    public static int       KICK_ONLINE_AMOUNT;
+    
+    public static boolean   DEATH_HIDE;
+    public static boolean   DEATH_USE_PERMS;
+    public static int       DEATH_ONLINE_AMOUNT;
     
     public static void init() {
         reload();
@@ -62,11 +73,27 @@ public class Config {
         NO_ACCESS_MESSAGE = config.getString("NoCommandPermissionMsg");
         PPT_ENABLED = config.getBoolean("PerPlayerToggle.Enable");
         PPT_STREAM_ENABLED_BY_DEF = config.getBoolean("PerPlayerToggle.StreamEnabledByDefault");
+        
+        JOIN_HIDE = config.getBoolean("Join.Enabled");
+        JOIN_USE_PERMS = config.getBoolean("Join.Permissions.UsePermissions");
+        JOIN_ONLINE_AMOUNT = config.getInt("Join.NeedsToBeOnline");
+        
+        QUIT_HIDE = config.getBoolean("Quit.Enabled");
+        JOIN_USE_PERMS = config.getBoolean("Quit.Permissions.UsePermissions");
+        QUIT_ONLINE_AMOUNT = config.getInt("Quit.NeedsToBeOnline");
+        
+        KICK_HIDE = config.getBoolean("Kick.Enabled");
+        JOIN_USE_PERMS = config.getBoolean("Kick.Permissions.UsePermissions");
+        KICK_ONLINE_AMOUNT = config.getInt("Kick.NeedsToBeOnline");
+        
+        DEATH_HIDE = config.getBoolean("Death.Enabled");
+        JOIN_USE_PERMS = config.getBoolean("Death.Permissions.UsePermissions");
+        DEATH_ONLINE_AMOUNT = config.getInt("Death.NeedsToBeOnline");
     }
     
     public static void reload() {
         if(configFile == null) {
-            configFile = new File(plugin.getDataFolder(), "config.yml");
+            configFile = new File(Main.instance.getDataFolder(), "config.yml");
         }
         config = YamlConfiguration.loadConfiguration(configFile);
     }
@@ -84,7 +111,8 @@ public class Config {
         try {
             config.save(configFile);
         } catch (IOException ex) {
-            Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, "Could not save config.yml to " + configFile, ex);
+            Log.severe("Could not save config.yml to " + configFile.getAbsolutePath());
+            ex.printStackTrace();
         }
     }
     
