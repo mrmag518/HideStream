@@ -36,7 +36,8 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleJoin(PlayerJoinEvent event) {
-        if(!Config.ENABLED && !Config.JOIN_HIDE) return;
+        if(!Config.ENABLED) return;
+        if(!Config.JOIN_HIDE) return;
         Player p = event.getPlayer();
         
         if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
@@ -51,7 +52,7 @@ public class EventManager implements Listener {
                     return;
                 }
             }
-
+            
             if(Config.getConfig().getBoolean("Join.OnlyForNewPlayers")) {
                 if(p.hasPlayedBefore()) {
                     return;
@@ -61,7 +62,7 @@ public class EventManager implements Listener {
                     return;
                 }
             }
-
+            
             if(Config.JOIN_USE_PERMS) {
                 if(Config.getConfig().getBoolean("Join.Permissions.HideOnlyIfHasPermission")) {
                     if(p.hasPermission("hidestream.hidejoin")) {
@@ -80,7 +81,8 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleQuit(PlayerQuitEvent event) {
-        if(!Config.ENABLED && !Config.QUIT_HIDE) return;
+        if(!Config.ENABLED) return;
+        if(!Config.QUIT_HIDE) return;
         Player p = event.getPlayer();
         
         if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
@@ -124,7 +126,8 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleKick(PlayerKickEvent event) {
-        if(!Config.ENABLED && !Config.KICK_HIDE) return;
+        if(!Config.ENABLED) return;
+        if(!Config.KICK_HIDE) return;
         Player p = event.getPlayer();
         
         if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
@@ -168,7 +171,8 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleDeath(PlayerDeathEvent event) {
-        if(!Config.ENABLED && !Config.DEATH_HIDE) return;
+        if(!Config.ENABLED) return;
+        if(!Config.DEATH_HIDE) return;
         Player p = event.getEntity();
         
         if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {

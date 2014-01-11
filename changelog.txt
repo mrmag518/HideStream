@@ -1,3 +1,6 @@
+Version 3.5.1
+* Fixed stream always being hidden, no matter if you have disabled it or not.
+
 Version 3.5
 * More performance improvements.
 ** Caches often used configuration options.
