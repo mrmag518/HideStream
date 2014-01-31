@@ -1,5 +1,14 @@
+Version 3.6
+* Fixed a problem with permissions handling.
+* There has been a major change to how kick and quit messages are processed by HideStream.
+** The two features will now be completely compatible with eachother.
+** This fixes a bug where if you, for an example only wanted kick messages to show in the chat, it would not work as the quit management is handled after kick management. In other words, the quit management had higher priority than kick management.
+** Thanks to becja2010 for pointing out this error.
+* There has been some minor changes to the configuration file to clear up some confusion.
+* Fixed some graphical issues with the command help page.
+
 Version 3.5.1
-* Fixed stream always being hidden, no matter if you have disabled it or not.
+* Fixed stream always being hidden, no matter if you had disabled it or not.
 
 Version 3.5
 * More performance improvements.

@@ -13,13 +13,11 @@ public class StreamDB {
     public static File databaseFile = null;
     
     public static void init() {
-        reload();
-        load();
-        reload();
+        reload(); load(); reload();
     }
     
     public static void load() {
-        getDB().options().header("This file will only be in function if 'PerPlayerToggle' is enabled.\n");
+        getDB().options().header("This file will only be used if 'PerPlayerToggle' is enabled.\n");
         getDB().options().copyDefaults(true);
         save();
     }
@@ -32,9 +30,7 @@ public class StreamDB {
     }
     
     public static FileConfiguration getDB() {
-        if (database == null) {
-            reload();
-        }
+        if (database == null) reload();
         return database;
     }
     
@@ -42,6 +38,7 @@ public class StreamDB {
         if (database == null || databaseFile == null) {
             return;
         }
+        
         try {
             database.save(databaseFile);
         } catch (IOException ex) {
@@ -51,13 +48,11 @@ public class StreamDB {
     }
     
     public static void setHidden(String target, boolean value) {
-        target = target.toLowerCase();
-        getDB().set(target, value);
+        getDB().set(target.toLowerCase(), value);
         save();
     }
     
     public static boolean isHidden(String target) {
-        target = target.toLowerCase();
-        return getDB().getBoolean(target);
+        return getDB().getBoolean(target.toLowerCase());
     }
 }

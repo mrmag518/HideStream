@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends JavaPlugin {
     public static String latestUpdate = "null";
@@ -31,19 +32,12 @@ public class Main extends JavaPlugin {
         getCommand("hidestream").setExecutor(new Commands());
         
         if(Config.UPDATE_CHECKING) {
-            new Thread(new Runnable() {
+            getServer().getScheduler().runTaskTimerAsynchronously(this, new BukkitRunnable() {
                 @Override
                 public void run() {
                     updateCheck();
                 }
-            }).start();
-            
-            getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
-                @Override
-                public void run() {
-                    updateCheck();
-                }
-            }, 20*60*60*4, 20*60*60*4);
+            }, 0, 20*60*60*3);
         }
         
         try {

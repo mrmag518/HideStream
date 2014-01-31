@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -14,20 +15,21 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+/**
+ * @author Gravity
+ * @version 2.1
+ */
 public class Updater {
-    private final Plugin plugin;
-    private final UpdateType type;
+    private Plugin plugin;
+    private UpdateType type;
     private String versionName;
     private String versionLink;
     private String versionType;
     private String versionGameVersion;
-
-    private final boolean announce;
-
+    private boolean announce;
     private URL url;
-    private final File file;
+    private File file;
     private Thread thread;
-
     private int id = -1;
     private String apiKey = null;
     private static final String TITLE_VALUE = "name";
@@ -36,11 +38,12 @@ public class Updater {
     private static final String VERSION_VALUE = "gameVersion";
     private static final String QUERY = "/servermods/files?projectIds=";
     private static final String HOST = "https://api.curseforge.com";
-
+    private static final String USER_AGENT = "Updater (by Gravity)";
+    private static final String delimiter = "^v|[\\s_-]v";
     private static final String[] NO_UPDATE_TAG = { "-DEV", "-PRE", "-SNAPSHOT" };
     private static final int BYTE_SIZE = 1024;
-    private final YamlConfiguration config;
-    private final String updateFolder;
+    private final YamlConfiguration config = new YamlConfiguration();
+    private String updateFolder;
     private Updater.UpdateResult result = Updater.UpdateResult.SUCCESS;
     
     public enum UpdateResult {
@@ -52,15 +55,18 @@ public class Updater {
         FAIL_NOVERSION,
         FAIL_BADID,
         FAIL_APIKEY,
-        UPDATE_AVAILABLE
-    }
-
-    public enum UpdateType {
-        DEFAULT,
-        NO_VERSION_CHECK,
-        NO_DOWNLOAD
+        UPDATE_AVAILABLE;
     }
     
+    public enum UpdateType {
+        DEFAULT, NO_VERSION_CHECK, NO_DOWNLOAD;
+    }
+    
+    public enum ReleaseType {
+        ALPHA, BETA, RELEASE;
+    }
+    
+    @SuppressWarnings("CallToThreadStartDuringObjectConstruction")
     public Updater(Plugin plugin, int id, File file, UpdateType type, boolean announce) {
         this.plugin = plugin;
         this.type = type;
@@ -73,33 +79,32 @@ public class Updater {
         final File updaterFile = new File(pluginFile, "Updater");
         final File updaterConfigFile = new File(updaterFile, "config.yml");
 
-        if (!updaterFile.exists()) {
-            updaterFile.mkdir();
-        }
-        if (!updaterConfigFile.exists()) {
-            try {
-                updaterConfigFile.createNewFile();
-            } catch (final IOException e) {
-                plugin.getLogger().severe("The updater could not create a configuration in " + updaterFile.getAbsolutePath());
-                e.printStackTrace();
-            }
-        }
-        this.config = YamlConfiguration.loadConfiguration(updaterConfigFile);
-
         this.config.options().header("This configuration file affects all plugins using the Updater system (version 2+ - http://forums.bukkit.org/threads/96681/ )" + '\n'
                 + "If you wish to use your API key, read http://wiki.bukkit.org/ServerMods_API and place it below." + '\n'
                 + "Some updating systems will not adhere to the disabled value, but these may be turned off in their plugin's configuration.");
         this.config.addDefault("api-key", "PUT_API_KEY_HERE");
         this.config.addDefault("disable", false);
 
-        if (this.config.get("api-key", null) == null) {
-            this.config.options().copyDefaults(true);
-            try {
+        if (!updaterFile.exists()) {
+            updaterFile.mkdir();
+        }
+
+        boolean createFile = !updaterConfigFile.exists();
+        try {
+            if (createFile) {
+                updaterConfigFile.createNewFile();
+                this.config.options().copyDefaults(true);
                 this.config.save(updaterConfigFile);
-            } catch (final IOException e) {
-                plugin.getLogger().severe("The updater could not save the configuration in " + updaterFile.getAbsolutePath());
-                e.printStackTrace();
+            } else {
+                this.config.load(updaterConfigFile);
             }
+        } catch (final Exception e) {
+            if (createFile) {
+                plugin.getLogger().severe("The updater could not create configuration at " + updaterFile.getAbsolutePath());
+            } else {
+                plugin.getLogger().severe("The updater could not load configuration at " + updaterFile.getAbsolutePath());
+            }
+            plugin.getLogger().log(Level.SEVERE, null, e);
         }
 
         if (this.config.getBoolean("disable")) {
@@ -117,9 +122,8 @@ public class Updater {
         try {
             this.url = new URL(Updater.HOST + Updater.QUERY + id);
         } catch (final MalformedURLException e) {
-            plugin.getLogger().severe("The project ID provided for updating, " + id + " is invalid.");
+            plugin.getLogger().log(Level.SEVERE, "The project ID provided for updating, " + id + " is invalid.", e);
             this.result = UpdateResult.FAIL_BADID;
-            e.printStackTrace();
         }
 
         this.thread = new Thread(new UpdateRunnable());
@@ -131,9 +135,16 @@ public class Updater {
         return this.result;
     }
     
-    public String getLatestType() {
+    public ReleaseType getLatestType() {
         this.waitForThread();
-        return this.versionType;
+        if (this.versionType != null) {
+            for (ReleaseType rt : ReleaseType.values()) {
+                if (this.versionType.equals(rt.name().toLowerCase())) {
+                    return rt;
+                }
+            }
+        }
+        return null;
     }
     
     public String getLatestGameVersion() {
@@ -156,22 +167,22 @@ public class Updater {
             try {
                 this.thread.join();
             } catch (final InterruptedException e) {
-                e.printStackTrace();
+                plugin.getLogger().log(Level.SEVERE, null, e);
             }
         }
     }
     
-    private void saveFile(File folder, String file, String u) {
+    private void saveFile(File folder, String file, String link) {
         if (!folder.exists()) {
             folder.mkdir();
         }
         BufferedInputStream in = null;
         FileOutputStream fout = null;
         try {
-            final URL url = new URL(u);
-            final int fileLength = url.openConnection().getContentLength();
-            in = new BufferedInputStream(url.openStream());
-            fout = new FileOutputStream(folder.getAbsolutePath() + "/" + file);
+            final URL url2 = new URL(link);
+            final int fileLength = url2.openConnection().getContentLength();
+            in = new BufferedInputStream(url2.openStream());
+            fout = new FileOutputStream(folder.getAbsolutePath() + File.separator + file);
 
             final byte[] data = new byte[Updater.BYTE_SIZE];
             int count;
@@ -194,14 +205,14 @@ public class Updater {
                 }
             }
             
-            final File dFile = new File(folder.getAbsolutePath() + "/" + file);
+            final File dFile = new File(folder.getAbsolutePath() + File.separator + file);
             if (dFile.getName().endsWith(".zip")) {
                 this.unzip(dFile.getCanonicalPath());
             }
             if (this.announce) {
                 this.plugin.getLogger().info("Finished updating.");
             }
-        } catch (final Exception ex) {
+        } catch (final IOException ex) {
             this.plugin.getLogger().warning("The auto-updater tried to download a new update, but was unsuccessful.");
             this.result = Updater.UpdateResult.FAIL_DOWNLOAD;
         } finally {
@@ -212,7 +223,7 @@ public class Updater {
                 if (fout != null) {
                     fout.close();
                 }
-            } catch (final Exception ex) {
+            } catch (final IOException ex) {
             }
         }
     }
@@ -243,7 +254,7 @@ public class Updater {
                     bis.close();
                     final String name = destinationFilePath.getName();
                     if (name.endsWith(".jar") && this.pluginFile(name)) {
-                        destinationFilePath.renameTo(new File(this.plugin.getDataFolder().getParent(), this.updateFolder + "/" + name));
+                        destinationFilePath.renameTo(new File(this.plugin.getDataFolder().getParent(), this.updateFolder + File.separator + name));
                     }
                 }
                 entry = null;
@@ -252,7 +263,7 @@ public class Updater {
             e = null;
             zipFile.close();
             zipFile = null;
-
+            
             for (final File dFile : new File(zipPath).listFiles()) {
                 if (dFile.isDirectory()) {
                     if (this.pluginFile(dFile.getName())) {
@@ -269,7 +280,7 @@ public class Updater {
                                 }
                             }
                             if (!found) {
-                                cFile.renameTo(new File(oFile.getCanonicalFile() + "/" + cFile.getName()));
+                                cFile.renameTo(new File(oFile.getCanonicalFile() + File.separator + cFile.getName()));
                             } else {
                                 cFile.delete();
                             }
@@ -280,17 +291,16 @@ public class Updater {
             }
             new File(zipPath).delete();
             fSourceZip.delete();
-        } catch (final IOException ex) {
-            this.plugin.getLogger().warning("The auto-updater tried to unzip a new update file, but was unsuccessful.");
+        } catch (final IOException e) {
+            this.plugin.getLogger().log(Level.SEVERE, "The auto-updater tried to unzip a new update file, but was unsuccessful.", e);
             this.result = Updater.UpdateResult.FAIL_DOWNLOAD;
-            ex.printStackTrace();
         }
         new File(file).delete();
     }
     
     private boolean pluginFile(String name) {
-        for (final File file : new File("plugins").listFiles()) {
-            if (file.getName().equals(name)) {
+        for (final File f : new File("plugins").listFiles()) {
+            if (f.getName().equals(name)) {
                 return true;
             }
         }
@@ -299,24 +309,18 @@ public class Updater {
     
     private boolean versionCheck(String title) {
         if (this.type != UpdateType.NO_VERSION_CHECK) {
-            final String version = this.plugin.getDescription().getVersion();
-            if (title.split(" v").length == 2) {
-                final String remoteVersion = title.split(" v")[1].split(" ")[0];
-                int remVer = -1, curVer = 0;
-                try {
-                    remVer = this.calVer(remoteVersion);
-                    curVer = this.calVer(version);
-                } catch (final NumberFormatException nfe) {
-                    remVer = -1;
-                }
-                if (this.hasTag(version) || version.equalsIgnoreCase(remoteVersion) || (curVer >= remVer)) {
+            final String localVersion = this.plugin.getDescription().getVersion();
+            if (title.split(delimiter).length == 2) {
+                final String remoteVersion = title.split(delimiter)[1].split(" ")[0]; // Get the newest file's version number
+                
+                if (this.hasTag(localVersion) || !this.shouldUpdate(localVersion, remoteVersion)) {
                     this.result = Updater.UpdateResult.NO_UPDATE;
                     return false;
                 }
             } else {
-                final String authorInfo = this.plugin.getDescription().getAuthors().size() == 0 ? "" : " (" + this.plugin.getDescription().getAuthors().get(0) + ")";
+                final String authorInfo = this.plugin.getDescription().getAuthors().isEmpty() ? "" : " (" + this.plugin.getDescription().getAuthors().get(0) + ")";
                 this.plugin.getLogger().warning("The author of this plugin" + authorInfo + " has misconfigured their Auto Update system");
-                this.plugin.getLogger().warning("Files uploaded to BukkitDev should contain the version number, seperated from the name by a 'v', such as PluginName v1.0");
+                this.plugin.getLogger().warning("File versions should follow the format 'PluginName vVERSION'");
                 this.plugin.getLogger().warning("Please notify the author of this error.");
                 this.result = Updater.UpdateResult.FAIL_NOVERSION;
                 return false;
@@ -325,18 +329,8 @@ public class Updater {
         return true;
     }
     
-    private Integer calVer(String s) throws NumberFormatException {
-        if (s.contains(".")) {
-            final StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < s.length(); i++) {
-                final Character c = s.charAt(i);
-                if (Character.isLetterOrDigit(c)) {
-                    sb.append(c);
-                }
-            }
-            return Integer.parseInt(sb.toString());
-        }
-        return Integer.parseInt(s);
+    public boolean shouldUpdate(String localVersion, String remoteVersion) {
+        return !localVersion.equalsIgnoreCase(remoteVersion);
     }
     
     private boolean hasTag(String version) {
@@ -347,7 +341,7 @@ public class Updater {
         }
         return false;
     }
-
+    
     private boolean read() {
         try {
             final URLConnection conn = this.url.openConnection();
@@ -356,7 +350,7 @@ public class Updater {
             if (this.apiKey != null) {
                 conn.addRequestProperty("X-API-Key", this.apiKey);
             }
-            conn.addRequestProperty("User-Agent", "Updater (by Gravity)");
+            conn.addRequestProperty("User-Agent", Updater.USER_AGENT);
 
             conn.setDoOutput(true);
 
@@ -379,15 +373,15 @@ public class Updater {
             return true;
         } catch (final IOException e) {
             if (e.getMessage().contains("HTTP response code: 403")) {
-                this.plugin.getLogger().warning("dev.bukkit.org rejected the API key provided in plugins/Updater/config.yml");
-                this.plugin.getLogger().warning("Please double-check your configuration to ensure it is correct.");
+                this.plugin.getLogger().severe("dev.bukkit.org rejected the API key provided in plugins/Updater/config.yml");
+                this.plugin.getLogger().severe("Please double-check your configuration to ensure it is correct.");
                 this.result = UpdateResult.FAIL_APIKEY;
             } else {
-                this.plugin.getLogger().warning("The updater could not contact dev.bukkit.org for updating.");
-                this.plugin.getLogger().warning("If you have not recently modified your configuration and this is the first time you are seeing this message, the site may be experiencing temporary downtime.");
+                this.plugin.getLogger().severe("The updater could not contact dev.bukkit.org for updating.");
+                this.plugin.getLogger().severe("If you have not recently modified your configuration and this is the first time you are seeing this message, the site may be experiencing temporary downtime.");
                 this.result = UpdateResult.FAIL_DBO;
             }
-            e.printStackTrace();
+            this.plugin.getLogger().log(Level.SEVERE, null, e);
             return false;
         }
     }

@@ -17,6 +17,7 @@ public class EventManager implements Listener {
     public void register() {
         Bukkit.getPluginManager().registerEvents(this, Main.instance);
     }
+    private boolean IS_KICK = false;
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void handleUpdate(PlayerJoinEvent event) {
@@ -30,14 +31,15 @@ public class EventManager implements Listener {
                     p.sendMessage("§f[§3HideStream§f] §ehttp://dev.bukkit.org/bukkit-plugins/hidestream/");
                     p.sendMessage("§f[§3HideStream§f] §eRun §7/hs update §eto update now.");
                 }
-            }, 100);
+            }, 110L);
         }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleJoin(PlayerJoinEvent event) {
-        if(!Config.ENABLED) return;
-        if(!Config.JOIN_HIDE) return;
+        if(!Config.ENABLED || !Config.JOIN_HIDE) {
+            return;
+        }
         Player p = event.getPlayer();
         
         if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
@@ -81,98 +83,110 @@ public class EventManager implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleQuit(PlayerQuitEvent event) {
-        if(!Config.ENABLED) return;
-        if(!Config.QUIT_HIDE) return;
-        Player p = event.getPlayer();
-        
-        if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
-            event.setQuitMessage(null);
-        } else {
-            if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
+        if(!IS_KICK) {
+            if(!Config.ENABLED || !Config.QUIT_HIDE) {
                 return;
             }
+            Player p = event.getPlayer();
 
-            if(Config.QUIT_ONLINE_AMOUNT > 0) {
-                if(Bukkit.getOfflinePlayers().length < Config.QUIT_ONLINE_AMOUNT) {
-                    return;
-                }
-            }
-
-            if(Config.getConfig().getBoolean("Quit.OnlyForNewPlayers")) {
-                if(p.hasPlayedBefore()) {
-                    return;
-                }
-            } else if(Config.getConfig().getBoolean("Quit.OnlyForOldPlayers")) {
-                if(!p.hasPlayedBefore()) {
-                    return;
-                }
-            }
-
-            if(Config.QUIT_USE_PERMS) {
-                if(Config.getConfig().getBoolean("Quit.Permissions.HideOnlyIfHasPermission")) {
-                    if(p.hasPermission("hidestream.hidequit")) {
-                        event.setQuitMessage(null);
-                    }
-                } else if(Config.getConfig().getBoolean("Quit.Permissions.HideOnlyIfWithoutPermission")) {
-                    if(!p.hasPermission("hidestream.hidequit")) {
-                        event.setQuitMessage(null);
-                    }
-                }
-            } else {
+            if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
                 event.setQuitMessage(null);
+            } else {
+                if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
+                    return;
+                }
+
+                if(Config.QUIT_ONLINE_AMOUNT > 0) {
+                    if(Bukkit.getOfflinePlayers().length < Config.QUIT_ONLINE_AMOUNT) {
+                        return;
+                    }
+                }
+
+                if(Config.getConfig().getBoolean("Quit.OnlyForNewPlayers")) {
+                    if(p.hasPlayedBefore()) {
+                        return;
+                    }
+                } else if(Config.getConfig().getBoolean("Quit.OnlyForOldPlayers")) {
+                    if(!p.hasPlayedBefore()) {
+                        return;
+                    }
+                }
+
+                if(Config.QUIT_USE_PERMS) {
+                    if(Config.getConfig().getBoolean("Quit.Permissions.HideOnlyIfHasPermission")) {
+                        if(p.hasPermission("hidestream.hidequit")) {
+                            event.setQuitMessage(null);
+                        }
+                    } else if(Config.getConfig().getBoolean("Quit.Permissions.HideOnlyIfWithoutPermission")) {
+                        if(!p.hasPermission("hidestream.hidequit")) {
+                            event.setQuitMessage(null);
+                        }
+                    }
+                } else {
+                    event.setQuitMessage(null);
+                }
+            }
+        } else {
+            if(!Config.ENABLED || !Config.KICK_HIDE) {
+                return;
+            }
+            Player p = event.getPlayer();
+
+            if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
+                event.setQuitMessage(null);
+            } else {
+                if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
+                    return;
+                }
+
+                if(Config.KICK_ONLINE_AMOUNT > 0) {
+                    if(Bukkit.getOfflinePlayers().length < Config.KICK_ONLINE_AMOUNT) {
+                        return;
+                    }
+                }
+
+                if(Config.getConfig().getBoolean("Kick.OnlyForNewPlayers")) {
+                    if(p.hasPlayedBefore()) {
+                        return;
+                    }
+                } else if(Config.getConfig().getBoolean("Kick.OnlyForOldPlayers")) {
+                    if(!p.hasPlayedBefore()) {
+                        return;
+                    }
+                }
+
+                if(Config.KICK_USE_PERMS) {
+                    if(Config.getConfig().getBoolean("Kick.Permissions.HideOnlyIfHasPermission")) {
+                        if(p.hasPermission("hidestream.hidekick")) {
+                            event.setQuitMessage(null);
+                        }
+                    } else if(Config.getConfig().getBoolean("Kick.Permissions.HideOnlyIfWithoutPermission")) {
+                        if(!p.hasPermission("hidestream.hidekick")) {
+                            event.setQuitMessage(null);
+                        }
+                    }
+                } else {
+                    event.setQuitMessage(null);
+                }
             }
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void handleKick(PlayerKickEvent event) {
-        if(!Config.ENABLED) return;
-        if(!Config.KICK_HIDE) return;
-        Player p = event.getPlayer();
-        
-        if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
-            event.setLeaveMessage(null);
-        } else {
-            if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
-                return;
-            }
-
-            if(Config.KICK_ONLINE_AMOUNT > 0) {
-                if(Bukkit.getOfflinePlayers().length < Config.KICK_ONLINE_AMOUNT) {
-                    return;
-                }
-            }
-
-            if(Config.getConfig().getBoolean("Kick.OnlyForNewPlayers")) {
-                if(p.hasPlayedBefore()) {
-                    return;
-                }
-            } else if(Config.getConfig().getBoolean("Kick.OnlyForOldPlayers")) {
-                if(!p.hasPlayedBefore()) {
-                    return;
-                }
-            }
-
-            if(Config.KICK_USE_PERMS) {
-                if(Config.getConfig().getBoolean("Kick.Permissions.HideOnlyIfHasPermission")) {
-                    if(p.hasPermission("hidestream.hidekick")) {
-                        event.setLeaveMessage(null);
-                    }
-                } else if(Config.getConfig().getBoolean("Kick.Permissions.HideOnlyIfWithoutPermission")) {
-                    if(!p.hasPermission("hidestream.hidekick")) {
-                        event.setLeaveMessage(null);
-                    }
-                }
-            } else {
-                event.setLeaveMessage(null);
-            }
-        }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void processQuit(PlayerQuitEvent event) {
+        IS_KICK = false;
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void processKick(PlayerKickEvent event) {
+        IS_KICK = true;
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void handleDeath(PlayerDeathEvent event) {
-        if(!Config.ENABLED) return;
-        if(!Config.DEATH_HIDE) return;
+        if(!Config.ENABLED || !Config.DEATH_HIDE) {
+            return;
+        }
         Player p = event.getEntity();
         
         if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {

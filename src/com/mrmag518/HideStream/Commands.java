@@ -16,14 +16,20 @@ public class Commands implements CommandExecutor {
             if(sender instanceof Player) {
                 if(args.length == 0) {
                     if(sender.hasPermission("hidestream.command.list")) {
-                        sender.sendMessage("------------------- §eHideStream v" + Main.instance.getDescription().getFullName() + "§f -------------------");
+                        String s = Main.instance.getDescription().getFullName();
+                        
+                        if(s.split("\\.").length > 2) {
+                            sender.sendMessage("------------------- §e" + s + "§f ------------------");
+                        } else {
+                            sender.sendMessage("------------------- §e" + s + "§f -------------------");
+                        }
                         sender.sendMessage("§e/hs reload");
                         sender.sendMessage(" §7-> §3Reload the configuration file.");
                         sender.sendMessage("§e/hs enable");
                         sender.sendMessage(" §7-> §3Enable HideStream.");
                         sender.sendMessage("§e/hs disable");
                         sender.sendMessage(" §7-> §3Disable HideStream.");
-                        sender.sendMessage("§e/hs toggle [player]");
+                        sender.sendMessage("§e/hs toggle §7[§eplayer§7]");
                         sender.sendMessage(" §7-> §3Toggle stream for you or someone else.");
                         sender.sendMessage("§e/hs update");
                         sender.sendMessage(" §7-> §3Auto/force update HideStream.");
@@ -66,31 +72,7 @@ public class Commands implements CommandExecutor {
                         }
                     } else if(args[0].equalsIgnoreCase("update")) {
                         if(sender.hasPermission("hidestream.command.update")) {
-                            if(Config.UPDATE_CHECKING) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        sender.sendMessage(Main.prefix + "§eRunning updater ..");
-                                        
-                                        Updater updater = new Updater(Main.instance, 37123, Main.instance.getDataFile(), Updater.UpdateType.NO_VERSION_CHECK, true);
-                                        
-                                        switch(updater.getResult()) {
-                                            case FAIL_DBO: 
-                                                sender.sendMessage(Main.prefix + "§cUpdater failed! (Could not contact dev.bukkit.org)"); 
-                                                break;
-                                            case FAIL_DOWNLOAD: 
-                                                sender.sendMessage(Main.prefix + "§cUpdater failed! (Failed to download file)"); 
-                                                break;
-                                            case SUCCESS:
-                                                sender.sendMessage(Main.prefix + "§eDownload complete! (§7" + updater.getLatestName() + "§e)");
-                                                sender.sendMessage(Main.prefix + "§eRestart the server to apply the update.");
-                                                break;
-                                        }
-                                    }
-                                }).start();
-                            } else {
-                                sender.sendMessage(Main.prefix + "§cThe updater has not been enabled in the config!");
-                            }
+                            update(sender);
                         } else {
                             sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
                         }
@@ -100,7 +82,13 @@ public class Commands implements CommandExecutor {
                 }
             } else {
                 if(args.length == 0) {
-                    sender.sendMessage("------------------- HideStream v" + Main.instance.getDescription().getFullName() + " -------------------");
+                    String s = Main.instance.getDescription().getFullName();
+                    
+                    if(s.split("\\.").length > 2) {
+                        sender.sendMessage("------------------- " + s + " ------------------");
+                    } else {
+                        sender.sendMessage("------------------- " + s + " -------------------");
+                    }
                     sender.sendMessage("/hs reload");
                     sender.sendMessage(" -> Reload the configuration file.");
                     sender.sendMessage("/hs enable");
@@ -126,31 +114,7 @@ public class Commands implements CommandExecutor {
                             toggleHidden(sender, args[1]);
                         }
                     } else if(args[0].equalsIgnoreCase("update")) {
-                        if(Config.UPDATE_CHECKING) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    sender.sendMessage("Running updater ..");
-                                    
-                                    Updater updater = new Updater(Main.instance, 37123, Main.instance.getDataFile(), Updater.UpdateType.NO_VERSION_CHECK, true);
-                                    
-                                    switch(updater.getResult()) {
-                                        case FAIL_DBO: 
-                                            sender.sendMessage("Updater failed! (Could not contact dev.bukkit.org)"); 
-                                            break;
-                                        case FAIL_DOWNLOAD: 
-                                            sender.sendMessage("Updater failed! (Failed to download file)"); 
-                                            break;
-                                        case SUCCESS:
-                                            sender.sendMessage("Download complete! (" + updater.getLatestName() + ")");
-                                            sender.sendMessage("Restart the server to apply the update.");
-                                            break;
-                                    }
-                                }
-                            }).start();
-                        } else {
-                            sender.sendMessage("The updater has not been enabled in the config!");
-                        }
+                        update(sender);
                     }
                     else {
                         sender.sendMessage("Unknown command. Run '/hidestream' for help.");
@@ -160,6 +124,34 @@ public class Commands implements CommandExecutor {
             return true;
         }
         return false;
+    }
+    
+    private void update(final CommandSender sender) {
+        if(Config.UPDATE_CHECKING) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sender.sendMessage(Main.prefix + "§eRunning updater ..");
+
+                    Updater updater = new Updater(Main.instance, 37123, Main.instance.getDataFile(), Updater.UpdateType.NO_VERSION_CHECK, true);
+                    
+                    switch(updater.getResult()) {
+                        case FAIL_DBO: 
+                            sender.sendMessage(Main.prefix + "§cUpdater failed! (Could not contact dev.bukkit.org)"); 
+                            break;
+                        case FAIL_DOWNLOAD: 
+                            sender.sendMessage(Main.prefix + "§cUpdater failed! (Failed to download file)"); 
+                            break;
+                        case SUCCESS:
+                            sender.sendMessage(Main.prefix + "§eDownload complete! (§7" + updater.getLatestName() + "§e)");
+                            sender.sendMessage(Main.prefix + "§eRestart the server to apply the update.");
+                            break;
+                    }
+                }
+            }).start();
+        } else {
+            sender.sendMessage(Main.prefix + "§cThe updater has not been enabled in the config!");
+        }
     }
     
     private void reload(CommandSender sender) {
@@ -193,7 +185,7 @@ public class Commands implements CommandExecutor {
     }
     
     private void toggleHidden(CommandSender sender, String target) {
-        if(Config.getConfig().getBoolean("PerPlayerToggle.Enable")) {
+        if(Config.PPT_ENABLED) {
             target = target.toLowerCase();
             
             if(StreamDB.isHidden(target)) {
