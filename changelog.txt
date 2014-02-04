@@ -1,3 +1,6 @@
+Version 3.6.1
+* Hotfix for an issue with online player amount analyzing.
+
 Version 3.6
 * Fixed a problem with permissions handling.
 * There has been a major change to how kick and quit messages are processed by HideStream.

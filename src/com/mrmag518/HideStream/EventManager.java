@@ -50,7 +50,7 @@ public class EventManager implements Listener {
             }
 
             if(Config.JOIN_ONLINE_AMOUNT > 0) {
-                if(Bukkit.getOfflinePlayers().length < Config.JOIN_ONLINE_AMOUNT) {
+                if(Bukkit.getOnlinePlayers().length < Config.JOIN_ONLINE_AMOUNT) {
                     return;
                 }
             }
@@ -97,7 +97,7 @@ public class EventManager implements Listener {
                 }
 
                 if(Config.QUIT_ONLINE_AMOUNT > 0) {
-                    if(Bukkit.getOfflinePlayers().length < Config.QUIT_ONLINE_AMOUNT) {
+                    if(Bukkit.getOnlinePlayers().length < Config.QUIT_ONLINE_AMOUNT) {
                         return;
                     }
                 }
@@ -140,7 +140,7 @@ public class EventManager implements Listener {
                 }
 
                 if(Config.KICK_ONLINE_AMOUNT > 0) {
-                    if(Bukkit.getOfflinePlayers().length < Config.KICK_ONLINE_AMOUNT) {
+                    if(Bukkit.getOnlinePlayers().length < Config.KICK_ONLINE_AMOUNT) {
                         return;
                     }
                 }
@@ -197,7 +197,7 @@ public class EventManager implements Listener {
             }
             
             if(Config.DEATH_ONLINE_AMOUNT > 0) {
-                if(Bukkit.getOfflinePlayers().length < Config.DEATH_ONLINE_AMOUNT) {
+                if(Bukkit.getOnlinePlayers().length < Config.DEATH_ONLINE_AMOUNT) {
                     return;
                 }
             }
