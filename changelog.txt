@@ -1,4 +1,4 @@
-Version 3,7
+Version 3.7
 * HideStream has been given minor modifications to support UUIDs.
 * Slightly altered some output.
 
