@@ -54,33 +54,26 @@ public class Main extends JavaPlugin {
     private void updateCheck() {
         Log.info("Running updater ..");
         
-        try {
-            Updater updater = new Updater(this, 37123, getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
-
-            Updater.UpdateResult result = updater.getResult();
-            switch(result) {
-                case NO_UPDATE:
-                    Log.info("No update was found.");
-                    break;
-                case FAIL_DBO:
-                    Log.warning("Failed to contact dev.bukkkit.org!");
-                    break;
-                case UPDATE_AVAILABLE:
-                    latestUpdate = updater.getLatestName();
-                    Log.info(" ------------- ");
-                    Log.info("A new version has been found! (" + latestUpdate + ")");
-                    Log.info("You are currently running " + getDescription().getFullName());
-                    Log.info(" ------------- ");
-                    break;
-                case DISABLED:
-                    Log.info("Updater checker has been disabled in the updater config.");
-                    break;
-                case FAIL_APIKEY:
-                    Log.warning("The API key you have provided is incorrect!");
-                    break;
-            }
-        } catch(RuntimeException e) {
-            Log.warning("Failed to establish a connection to dev.bukkit.org!");
+        Updater updater = new Updater(this, 37123, getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+        
+        Updater.UpdateResult result = updater.getResult();
+        switch(result) {
+            case NO_UPDATE:
+                Log.info("No update was found.");
+                break;
+            case UPDATE_AVAILABLE:
+                latestUpdate = updater.getLatestName();
+                Log.info("------------------------------------");
+                Log.info(latestUpdate + " is now available!");
+                Log.info("Run '/hs update' to update now.");
+                Log.info("------------------------------------");
+                break;
+            case DISABLED:
+                Log.info("Update checking has been disabled in the updater config.");
+                break;
+            case FAIL_APIKEY:
+                Log.warning("The API key you have provided is incorrect!");
+                break;
         }
     }
 }

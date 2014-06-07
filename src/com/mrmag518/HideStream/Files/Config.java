@@ -37,11 +37,10 @@ public class Config {
     
     public static void init() {
         reload(); load(); reload();
-        Log.info("Configuration loaded.");
     }
     
     private static void load() {
-        config.options().header("For an explanation of these configuration settings, please visit\n"
+        config.options().header("If you need help with these settings, please visit\n"
                 + "http://dev.bukkit.org/server-mods/hidestream/pages/config-explanation/ \n");
 
         config.addDefault("Enabled", true);
@@ -113,7 +112,7 @@ public class Config {
         
         try {
             config.save(configFile);
-        } catch (IOException ex) {
+        } catch(IOException ex) {
             Log.severe("Could not save config.yml to " + configFile.getAbsolutePath());
             ex.printStackTrace();
         }

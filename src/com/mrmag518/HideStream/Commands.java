@@ -2,8 +2,14 @@ package com.mrmag518.HideStream;
 
 import com.mrmag518.HideStream.Files.Config;
 import com.mrmag518.HideStream.Files.StreamDB;
+import com.mrmag518.HideStream.Util.UUIDFetcher;
 import com.mrmag518.HideStream.Util.Updater;
 
+import java.util.Arrays;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,7 +69,7 @@ public class Commands implements CommandExecutor {
                             } else {
                                 sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
                             }
-                        } else if(args.length == 2){
+                        } else if(args.length >= 2){
                             if(sender.hasPermission("hidestream.command.hideme.others")) {
                                 toggleHidden(sender, args[1]);
                             } else {
@@ -85,9 +91,9 @@ public class Commands implements CommandExecutor {
                     String s = Main.instance.getDescription().getFullName();
                     
                     if(s.split("\\.").length > 2) {
-                        sender.sendMessage("------------------- " + s + " ------------------");
+                        sender.sendMessage("------------------ " + s + " -----------------");
                     } else {
-                        sender.sendMessage("------------------- " + s + " -------------------");
+                        sender.sendMessage("------------------ " + s + " ------------------");
                     }
                     sender.sendMessage("/hs reload");
                     sender.sendMessage(" -> Reload the configuration file.");
@@ -110,7 +116,7 @@ public class Commands implements CommandExecutor {
                     } else if(args[0].equalsIgnoreCase("toggle")) {
                         if(args.length == 1) {
                             sender.sendMessage("You can't toggle the console! Use '/hs toggle <player>'");
-                        } else if(args.length == 2){
+                        } else if(args.length >= 2){
                             toggleHidden(sender, args[1]);
                         }
                     } else if(args[0].equalsIgnoreCase("update")) {
@@ -184,29 +190,58 @@ public class Commands implements CommandExecutor {
         }
     }
     
-    private void toggleHidden(CommandSender sender, String target) {
+    private void toggleHidden(final CommandSender sender, final String target) {
         if(Config.PPT_ENABLED) {
-            target = target.toLowerCase();
-            
-            if(StreamDB.isHidden(target)) {
-                StreamDB.setHidden(target, false);
-                
-                if(sender.getName().equalsIgnoreCase(target)) {
-                    sender.sendMessage(Main.prefix + "§eStream output will now be shown for you.");
-                } else {
-                    sender.sendMessage(Main.prefix + "§eStream output will now be shown for " + target + ".");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    UUID uuid = null;
+                    OfflinePlayer op = Bukkit.getOfflinePlayer(target);
+                    
+                    if(Bukkit.getOnlineMode()) {
+                        if(op.isOnline()) {
+                            uuid = op.getUniqueId();
+                        } else {
+                            sender.sendMessage(Main.prefix + "§7Fetching player UUID ..");
+                            try {
+                                uuid = new UUIDFetcher(Arrays.asList(target)).call().get(target);
+                            } catch (Exception ex) {}
+                        }
+                    } else {
+                        uuid = op.getUniqueId();
+                    }
+                    
+                    if(uuid == null) {
+                        sender.sendMessage(Main.prefix + "§cCould not fetch UUID for §7" + target + "§c!");
+                        return;
+                    }
+                    
+                    if(StreamDB.getDB().get(target.toLowerCase()) != null) {
+                        StreamDB.getDB().set(target.toLowerCase(), null);
+                        StreamDB.save();
+                    }
+                    
+                    if(StreamDB.isHidden(uuid)) {
+                        StreamDB.setHidden(uuid, false);
+
+                        if(sender.getName().equalsIgnoreCase(target)) {
+                            sender.sendMessage(Main.prefix + "§eStream messages will now be shown for §7you§e.");
+                        } else {
+                            sender.sendMessage(Main.prefix + "§eStream messages will now be shown for §7" + target + "§e.");
+                        }
+                    } else {
+                        StreamDB.setHidden(uuid, true);
+
+                        if(sender.getName().equalsIgnoreCase(target)) {
+                            sender.sendMessage(Main.prefix + "§eStream messages will now be hidden for §7you§e.");
+                        } else {
+                            sender.sendMessage(Main.prefix + "§eStream messages will now be hidden for §7" + target + "§e.");
+                        }
+                    }
                 }
-            } else {
-                StreamDB.setHidden(target, true);
-                
-                if(sender.getName().equalsIgnoreCase(target)) {
-                    sender.sendMessage(Main.prefix + "§eStream output will now be hidden for you.");
-                } else {
-                    sender.sendMessage(Main.prefix + "§eStream output will now be hidden for " + target + ".");
-                }
-            }
+            }).start();
         } else {
-            sender.sendMessage(Main.prefix + "§eThis feature has not been enabled in the configuration file!");
+            sender.sendMessage(Main.prefix + "§eThis feature has not been enabled!");
         }
     }
 }

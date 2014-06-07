@@ -1,3 +1,7 @@
+Versuib 3,7
+* HideStream has been given minor modifications to support UUIDs.
+* Slightly altered some output.
+
 Version 3.6.1
 * Hotfix for an issue with online player amount analyzing.
 

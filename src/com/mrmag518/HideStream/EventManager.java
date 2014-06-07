@@ -12,6 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class EventManager implements Listener {
     public void register() {
@@ -24,7 +25,7 @@ public class EventManager implements Listener {
         final Player p = event.getPlayer();
         
         if(Config.UPDATE_CHECKING && !Main.latestUpdate.equals("null") && p.hasPermission("hidestream.getupdates")) {
-            Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
+            Bukkit.getScheduler().runTaskLater(Main.instance, new BukkitRunnable() {
                 @Override
                 public void run() {
                     p.sendMessage("§f[§3HideStream§f] §7" + Main.latestUpdate + " §eis now available!");
@@ -42,8 +43,12 @@ public class EventManager implements Listener {
         }
         Player p = event.getPlayer();
         
-        if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
-            event.setJoinMessage(null);
+        if(Config.PPT_ENABLED) {
+            StreamDB.processPlayer(p);
+            
+            if(StreamDB.isHidden(p.getUniqueId())) {
+                event.setJoinMessage(null);
+            }
         } else {
             if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
                 return;
@@ -89,7 +94,7 @@ public class EventManager implements Listener {
             }
             Player p = event.getPlayer();
 
-            if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
+            if(Config.PPT_ENABLED && StreamDB.isHidden(p.getUniqueId())) {
                 event.setQuitMessage(null);
             } else {
                 if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
@@ -132,7 +137,7 @@ public class EventManager implements Listener {
             }
             Player p = event.getPlayer();
 
-            if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
+            if(Config.PPT_ENABLED && StreamDB.isHidden(p.getUniqueId())) {
                 event.setQuitMessage(null);
             } else {
                 if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
@@ -189,7 +194,7 @@ public class EventManager implements Listener {
         }
         Player p = event.getEntity();
         
-        if(Config.PPT_ENABLED && StreamDB.isHidden(p.getName())) {
+        if(Config.PPT_ENABLED && StreamDB.isHidden(p.getUniqueId())) {
             event.setDeathMessage(null);
         } else {
             if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
