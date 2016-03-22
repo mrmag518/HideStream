@@ -1,3 +1,6 @@
+Version 3.8
+* Now supports 1.9 builds.
+
 Version 3.7
 * HideStream has been given minor modifications to support UUIDs.
 * Slightly altered some output.
