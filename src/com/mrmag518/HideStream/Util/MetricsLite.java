@@ -28,8 +28,10 @@
 package com.mrmag518.HideStream.Util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.scheduler.BukkitTask;
@@ -41,56 +43,67 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
-public class MetricsLite {
-
+public final class MetricsLite {
     /**
      * The current revision number
      */
     private final static int REVISION = 7;
+
     /**
      * The base url of the metrics domain
      */
     private static final String BASE_URL = "http://report.mcstats.org";
+
     /**
      * The url used to report a server's status
      */
     private static final String REPORT_URL = "/plugin/%s";
+
     /**
      * Interval of time to ping (in minutes)
      */
     private final static int PING_INTERVAL = 15;
+
     /**
      * The plugin this metrics submits for
      */
     private final Plugin plugin;
+
     /**
      * The plugin configuration file
      */
     private final YamlConfiguration configuration;
+
     /**
      * The plugin configuration file
      */
     private final File configurationFile;
+
     /**
      * Unique server id
      */
     private final String guid;
+
     /**
      * Debug mode
      */
     private final boolean debug;
+
     /**
      * Lock for synchronization
      */
     private final Object optOutLock = new Object();
+
     /**
      * Id of the scheduled task
      */
@@ -124,8 +137,9 @@ public class MetricsLite {
     }
 
     /**
-     * Start measuring statistics. This will immediately create an async repeating task as the plugin and send the initial data to the metrics
-     * backend, and then after that it will post in increments of PING_INTERVAL * 1200 ticks.
+     * Start measuring statistics. This will immediately create an async repeating task as the plugin and send
+     * the initial data to the metrics backend, and then after that it will post in increments of
+     * PING_INTERVAL * 1200 ticks.
      *
      * @return True if statistics measuring is running, otherwise false.
      */
@@ -143,8 +157,10 @@ public class MetricsLite {
 
             // Begin hitting the server with glorious data
             task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+
                 private boolean firstPost = true;
 
+                @Override
                 public void run() {
                     try {
                         // This has to be synchronized or it can collide with the disable method.
@@ -260,6 +276,28 @@ public class MetricsLite {
         // return => base/plugins/PluginMetrics/config.yml
         return new File(new File(pluginsFolder, "PluginMetrics"), "config.yml");
     }
+    
+    /**
+     * Gets the online player (backwards compatibility)
+     * 
+     * @return online player amount
+     */
+    private int getOnlinePlayers() {
+        try {
+            Method onlinePlayerMethod = Server.class.getMethod("getOnlinePlayers");
+            if(onlinePlayerMethod.getReturnType().equals(Collection.class)) {
+                return ((Collection<?>)onlinePlayerMethod.invoke(Bukkit.getServer())).size();
+            } else {
+                return ((Player[])onlinePlayerMethod.invoke(Bukkit.getServer())).length;
+            }
+        } catch (Exception ex) {
+            if (debug) {
+                Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
+            }
+        }
+        
+        return 0;
+    }
 
     /**
      * Generic method that posts a plugin to the metrics website
@@ -271,7 +309,7 @@ public class MetricsLite {
         boolean onlineMode = Bukkit.getServer().getOnlineMode(); // TRUE if online mode is enabled
         String pluginVersion = description.getVersion();
         String serverVersion = Bukkit.getVersion();
-        int playersOnline = Bukkit.getServer().getOnlinePlayers().length;
+        int playersOnline = this.getOnlinePlayers();
 
         // END server software specific section -- all code below does not use any code outside of this class / Java
 
@@ -384,11 +422,9 @@ public class MetricsLite {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (gzos != null) {
-                try {
-                    gzos.close();
-                } catch (IOException ignore) {
-                }
+            if (gzos != null) try {
+                gzos.close();
+            } catch (IOException ignore) {
             }
         }
 

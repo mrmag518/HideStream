@@ -32,7 +32,7 @@ public class Main extends JavaPlugin {
         getCommand("hidestream").setExecutor(new Commands());
         
         if(Config.UPDATE_CHECKING) {
-            getServer().getScheduler().runTaskTimerAsynchronously(this, new BukkitRunnable() {
+            getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
                 @Override
                 public void run() {
                     updateCheck();

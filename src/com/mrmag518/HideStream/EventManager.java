@@ -12,7 +12,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class EventManager implements Listener {
     public void register() {
@@ -25,7 +24,7 @@ public class EventManager implements Listener {
         final Player p = event.getPlayer();
         
         if(Config.UPDATE_CHECKING && !Main.latestUpdate.equals("null") && p.hasPermission("hidestream.getupdates")) {
-            Bukkit.getScheduler().runTaskLater(Main.instance, new BukkitRunnable() {
+            Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
                 @Override
                 public void run() {
                     p.sendMessage("§f[§3HideStream§f] §7" + Main.latestUpdate + " §eis now available!");
@@ -55,7 +54,7 @@ public class EventManager implements Listener {
             }
 
             if(Config.JOIN_ONLINE_AMOUNT > 0) {
-                if(Bukkit.getOnlinePlayers().length < Config.JOIN_ONLINE_AMOUNT) {
+                if(Bukkit.getOnlinePlayers().size() < Config.JOIN_ONLINE_AMOUNT) {
                     return;
                 }
             }
@@ -102,7 +101,7 @@ public class EventManager implements Listener {
                 }
 
                 if(Config.QUIT_ONLINE_AMOUNT > 0) {
-                    if(Bukkit.getOnlinePlayers().length < Config.QUIT_ONLINE_AMOUNT) {
+                    if(Bukkit.getOnlinePlayers().size() < Config.QUIT_ONLINE_AMOUNT) {
                         return;
                     }
                 }
@@ -145,7 +144,7 @@ public class EventManager implements Listener {
                 }
 
                 if(Config.KICK_ONLINE_AMOUNT > 0) {
-                    if(Bukkit.getOnlinePlayers().length < Config.KICK_ONLINE_AMOUNT) {
+                    if(Bukkit.getOnlinePlayers().size() < Config.KICK_ONLINE_AMOUNT) {
                         return;
                     }
                 }
@@ -202,7 +201,7 @@ public class EventManager implements Listener {
             }
             
             if(Config.DEATH_ONLINE_AMOUNT > 0) {
-                if(Bukkit.getOnlinePlayers().length < Config.DEATH_ONLINE_AMOUNT) {
+                if(Bukkit.getOnlinePlayers().size() < Config.DEATH_ONLINE_AMOUNT) {
                     return;
                 }
             }
