@@ -46,10 +46,10 @@ public class Commands implements CommandExecutor {
                             sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
                         }
                     } else if(args[0].equalsIgnoreCase("onlinecount") || args[0].equalsIgnoreCase("onlineamount") || args[0].equalsIgnoreCase("togglecount") || args[0].equalsIgnoreCase("online")) {
-                        if(sender.hasPermission("hidestream.command.togglecount")) {
+                        if(sender.hasPermission("hidestream.command.onlineamount")) {
                             if(args.length < 2) {
                                 sender.sendMessage(Main.prefix + "§cYou need to specify a number of players.");
-                                sender.sendMessage(Main.prefix + "§e/hs togglecount §7<§eamountOfPlayers§7>");
+                                sender.sendMessage(Main.prefix + "§e/hs onlineamount §7<§eamountOfPlayers§7>");
                                 sender.sendMessage(Main.prefix + "§3This will make it so that stream is only disabled when the specified amount of players are online.");
                             } else {
                                 if(args.length > 2) {
