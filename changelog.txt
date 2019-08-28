@@ -1,10 +1,9 @@
 Version 3.9
 * Updated to officially support Minecraft // Spigot // Bukkit 1.14.4
-* Added a new command which allows you to change/configure the amount of players that has to be online in order for stream messages to     be hidden(affected to HideStream) in-game. 
+* Added a new command which allows you to change/configure the amount of players that has to be online in order for stream messages to  be hidden(affected to HideStream) in-game. 
 ** /hs onlineamount <amountOfPlayers> [join/quit/kick/death]
 ** Permission: hidestream.command.onlineamount
-** You do not necessarily need to specify a category, if none is typed HideStream will make the change globally across all categories.
-   Updated the auto-updater library(BukkitDev).
+** You do not necessarily need to specify a category, if none is typed HideStream will make the change globally across all categories. Updated the auto-updater library(BukkitDev).
 * Changed metrics from mcstats to bStats.
 
 Version 3.8
