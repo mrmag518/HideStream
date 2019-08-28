@@ -7,10 +7,8 @@ import com.mrmag518.HideStream.Util.MetricsLite;
 import com.mrmag518.HideStream.Util.Updater;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends JavaPlugin {
     public static String latestUpdate = "null";
@@ -30,6 +28,7 @@ public class Main extends JavaPlugin {
         Config.init();
         if(Config.PPT_ENABLED) StreamDB.init();
         getCommand("hidestream").setExecutor(new Commands());
+        MetricsLite metrics = new MetricsLite(this);
         
         if(Config.UPDATE_CHECKING) {
             getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
@@ -39,11 +38,6 @@ public class Main extends JavaPlugin {
                 }
             }, 0, 20*60*60*3);
         }
-        
-        try {
-            MetricsLite metrics = new MetricsLite(this);
-            metrics.start();
-        } catch (IOException e) {}
         Log.info("Version " + getDescription().getVersion() + " enabled.");
     }
     

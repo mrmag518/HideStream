@@ -41,7 +41,7 @@ public class Config {
     
     private static void load() {
         config.options().header("If you need help with these settings, please visit\n"
-                + "http://dev.bukkit.org/server-mods/hidestream/pages/config-explanation/ \n");
+                + "https://dev.bukkit.org/projects/hidestream/pages/config-explanation/ \n");
 
         config.addDefault("Enabled", true);
         config.addDefault("CheckForUpdates", true);
@@ -114,7 +114,6 @@ public class Config {
             config.save(configFile);
         } catch(IOException ex) {
             Log.severe("Could not save config.yml to " + configFile.getAbsolutePath());
-            ex.printStackTrace();
         }
     }
     

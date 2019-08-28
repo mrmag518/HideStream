@@ -46,7 +46,6 @@ public class StreamDB {
             database.save(databaseFile);
         } catch(IOException ex) {
             Log.severe("Could not save streamDB.yml to " + databaseFile.getAbsolutePath());
-            ex.printStackTrace();
         }
     }
     

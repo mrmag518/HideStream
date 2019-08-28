@@ -22,24 +22,7 @@ public class Commands implements CommandExecutor {
             if(sender instanceof Player) {
                 if(args.length == 0) {
                     if(sender.hasPermission("hidestream.command.list")) {
-                        String s = Main.instance.getDescription().getFullName();
-                        
-                        if(s.split("\\.").length > 2) {
-                            sender.sendMessage("------------------- §e" + s + "§f ------------------");
-                        } else {
-                            sender.sendMessage("------------------- §e" + s + "§f -------------------");
-                        }
-                        sender.sendMessage("§e/hs reload");
-                        sender.sendMessage(" §7-> §3Reload the configuration file.");
-                        sender.sendMessage("§e/hs enable");
-                        sender.sendMessage(" §7-> §3Enable HideStream.");
-                        sender.sendMessage("§e/hs disable");
-                        sender.sendMessage(" §7-> §3Disable HideStream.");
-                        sender.sendMessage("§e/hs toggle §7[§eplayer§7]");
-                        sender.sendMessage(" §7-> §3Toggle stream for you or someone else.");
-                        sender.sendMessage("§e/hs update");
-                        sender.sendMessage(" §7-> §3Auto/force update HideStream.");
-                        sender.sendMessage("-----------------------------------------------------");
+                        sendHelpMessage(sender);
                     } else {
                         sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
                     }
@@ -59,6 +42,22 @@ public class Commands implements CommandExecutor {
                     } else if(args[0].equalsIgnoreCase("disable")) {
                         if(sender.hasPermission("hidestream.command.disable")) {
                             disable(sender);
+                        } else {
+                            sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
+                        }
+                    } else if(args[0].equalsIgnoreCase("onlinecount") || args[0].equalsIgnoreCase("onlineamount") || args[0].equalsIgnoreCase("togglecount") || args[0].equalsIgnoreCase("online")) {
+                        if(sender.hasPermission("hidestream.command.togglecount")) {
+                            if(args.length < 2) {
+                                sender.sendMessage(Main.prefix + "§cYou need to specify a number of players.");
+                                sender.sendMessage(Main.prefix + "§e/hs togglecount §7<§eamountOfPlayers§7>");
+                                sender.sendMessage(Main.prefix + "§3This will make it so that stream is only disabled when the specified amount of players are online.");
+                            } else {
+                                if(args.length > 2) {
+                                    changeOnlineAmount(sender, args[1], args[2]);
+                                } else {
+                                    changeOnlineAmount(sender, args[1], "global");
+                                }
+                            }
                         } else {
                             sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
                         }
@@ -88,24 +87,7 @@ public class Commands implements CommandExecutor {
                 }
             } else {
                 if(args.length == 0) {
-                    String s = Main.instance.getDescription().getFullName();
-                    
-                    if(s.split("\\.").length > 2) {
-                        sender.sendMessage("------------------ " + s + " -----------------");
-                    } else {
-                        sender.sendMessage("------------------ " + s + " ------------------");
-                    }
-                    sender.sendMessage("/hs reload");
-                    sender.sendMessage(" -> Reload the configuration file.");
-                    sender.sendMessage("/hs enable");
-                    sender.sendMessage(" -> Enable HideStream.");
-                    sender.sendMessage("/hs disable");
-                    sender.sendMessage(" -> Disable HideStream.");
-                    sender.sendMessage("/hs toggle [player]");
-                    sender.sendMessage(" -> Toggle stream for you or someone else.");
-                    sender.sendMessage("/hs update");
-                    sender.sendMessage(" -> Auto/force update HideStream.");
-                    sender.sendMessage("-----------------------------------------------------");
+                    sendHelpMessage(sender);
                 } else if(args.length > 0) {
                     if(args[0].equalsIgnoreCase("reload")) {
                         reload(sender);
@@ -113,7 +95,19 @@ public class Commands implements CommandExecutor {
                         enable(sender);
                     } else if(args[0].equalsIgnoreCase("disable")) {
                         disable(sender);
-                    } else if(args[0].equalsIgnoreCase("toggle")) {
+                    } else if(args[0].equalsIgnoreCase("onlineamount") || args[0].equalsIgnoreCase("onlinecount") || args[0].equalsIgnoreCase("togglecount") || args[0].equalsIgnoreCase("online")) {
+                        if(args.length < 2) {
+                            sender.sendMessage("You need to specify a number of players.");
+                            sender.sendMessage("/hs onlineamount <amountOfPlayers>");
+                            sender.sendMessage("This will make it so that stream is only disabled when the specified amount of players are online.");
+                        } else {
+                            if(args.length > 2) {
+                                changeOnlineAmount(sender, args[1], args[2]);
+                            } else {
+                                changeOnlineAmount(sender, args[1], "global");
+                            }
+                        }
+                } else if(args[0].equalsIgnoreCase("toggle")) {
                         if(args.length == 1) {
                             sender.sendMessage("You can't toggle the console! Use '/hs toggle <player>'");
                         } else if(args.length >= 2){
@@ -130,6 +124,80 @@ public class Commands implements CommandExecutor {
             return true;
         }
         return false;
+    }
+    
+    private void sendHelpMessage(CommandSender sender) {
+        String s = Main.instance.getDescription().getFullName();
+                        
+        if(s.split("\\.").length > 2) {
+            sender.sendMessage("------------------- §e" + s + "§f ------------------");
+        } else {
+            sender.sendMessage("------------------- §e" + s + "§f -------------------");
+        }
+        sender.sendMessage("§e/hs reload");
+        sender.sendMessage(" §7-> §3Reload the configuration file.");
+        sender.sendMessage("§e/hs enable");
+        sender.sendMessage(" §7-> §3Enable HideStream.");
+        sender.sendMessage("§e/hs disable");
+        sender.sendMessage(" §7-> §3Disable HideStream.");
+        sender.sendMessage("§e/hs onlineamount §7<§eamountOfPlayers§7> [§ejoin§7/§equit§7/§ekick§7/§edeath§7]");
+        sender.sendMessage(" §7-> §3Change the number of players that has to be online for effect.");
+        sender.sendMessage("§e/hs toggle §7[§eplayer§7]");
+        sender.sendMessage(" §7-> §3Toggle stream for you or someone else.");
+        sender.sendMessage("§e/hs update");
+        sender.sendMessage(" §7-> §3Auto/force update HideStream.");
+        sender.sendMessage("-----------------------------------------------------");
+    }
+    
+    private void changeOnlineAmount(CommandSender sender, final String amount, final String category) {
+        try {
+            int i = Integer.parseInt(amount);
+            
+            if(i < 0) {
+                sender.sendMessage(Main.prefix + "§cThe number of players must be above or equal 0.");
+                return;
+            }
+            
+            if(category.equalsIgnoreCase("global") || category.equalsIgnoreCase("all")) {
+                for(String s : new String[]{"Join", "Quit", "Kick", "Death"}) {
+                    Config.getConfig().set(s + ".NeedsToBeOnline", i);
+                    Config.save();
+                    Config.JOIN_ONLINE_AMOUNT = i;
+                    Config.QUIT_ONLINE_AMOUNT = i;
+                    Config.KICK_ONLINE_AMOUNT = i;
+                    Config.DEATH_ONLINE_AMOUNT = i;
+                }
+                sender.sendMessage(Main.prefix + "§eThe amount of players that has to be online is now: §7" + i);
+                sender.sendMessage(Main.prefix + "§3This change goes for §eall §3stream categories(§7Join, Quit, Kick and Death§3).");
+            } else {
+                if(category.equalsIgnoreCase("join") || category.equalsIgnoreCase("j")) {
+                    Config.getConfig().set("Join.NeedsToBeOnline", i);
+                    Config.save();
+                    Config.JOIN_ONLINE_AMOUNT = i;
+                } else if(category.equalsIgnoreCase("quit") || category.equalsIgnoreCase("leave") || category.equalsIgnoreCase("q")) {
+                    Config.getConfig().set("Quit.NeedsToBeOnline", i);
+                    Config.save();
+                    Config.QUIT_ONLINE_AMOUNT = i;
+                } else if(category.equalsIgnoreCase("kick") || category.equalsIgnoreCase("k")) {
+                    Config.getConfig().set("Kick.NeedsToBeOnline", i);
+                    Config.save();
+                    Config.KICK_ONLINE_AMOUNT = i;
+                } else if(category.equalsIgnoreCase("death") || category.equalsIgnoreCase("d")) {
+                    Config.getConfig().set("Death.NeedsToBeOnline", i);
+                    Config.save();
+                    Config.DEATH_ONLINE_AMOUNT = i;
+                } else {
+                    sender.sendMessage(Main.prefix + "§cThe category §7" + category + " §cwas not recognized.");
+                    sender.sendMessage(Main.prefix + "§3Categories: §eJoin§3, §eQuit§3, §eKick §3and §eDeath§3.");
+                    sender.sendMessage(Main.prefix + "§3If you want switch the count globally, use §e/hs onlineamount §3" + i);
+                    return;
+                }
+                sender.sendMessage(Main.prefix + "§eThe amount of players that has to be online is now: §7" + i);
+                sender.sendMessage(Main.prefix + "§3This change goes for the category: §e" + category);
+            }
+        } catch(NumberFormatException e) {
+            sender.sendMessage(Main.prefix + "§cYou need to specify a correct number. §7" + amount + "§c is not a valid number.");
+        }
     }
     
     private void update(final CommandSender sender) {

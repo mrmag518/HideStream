@@ -28,7 +28,7 @@ public class EventManager implements Listener {
                 @Override
                 public void run() {
                     p.sendMessage("§f[§3HideStream§f] §7" + Main.latestUpdate + " §eis now available!");
-                    p.sendMessage("§f[§3HideStream§f] §ehttp://dev.bukkit.org/bukkit-plugins/hidestream/");
+                    p.sendMessage("§f[§3HideStream§f] §ehttps://dev.bukkit.org/projects/hidestream");
                     p.sendMessage("§f[§3HideStream§f] §eRun §7/hs update §eto update now.");
                 }
             }, 110L);

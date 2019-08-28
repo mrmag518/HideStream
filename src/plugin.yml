@@ -1,13 +1,13 @@
 author: mrmag518
 main: com.mrmag518.HideStream.Main
-version: '3.8'
+version: '3.9'
 name: HideStream
 description: "Hide spam output such as join & leave messages."
 commands:
     hidestream:
         description: Parent command for all HideStream commands.
         usage: /<command> [args]
-        aliases: [hs]
+        aliases: [hs, hstream]
 permissions:
     hidestream.*:
         default: op
@@ -21,6 +21,7 @@ permissions:
             hidestream.command.reload: true
             hidestream.command.enable: true
             hidestream.command.disable: true
+            hidestream.command.onlineamount: true
             hidestream.command.hideme: true
             hidestream.command.hideme.others: true
             hidestream.command.update: true
@@ -41,6 +42,8 @@ permissions:
     hidestream.command.enable:
         default: op
     hidestream.command.disable:
+        default: op
+    hidestream.command.onlineamount:
         default: op
     hidestream.command.hideme:
         default: op
