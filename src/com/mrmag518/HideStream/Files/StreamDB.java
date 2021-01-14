@@ -57,14 +57,4 @@ public class StreamDB {
     public static boolean isHidden(UUID uuid) {
         return getDB().getBoolean(uuid.toString());
     }
-    
-    public static void processPlayer(Player p) {
-        String s = p.getName().toLowerCase();
-        
-        if(getDB().get(s) != null) {
-            setHidden(p.getUniqueId(), getDB().getBoolean(s));
-            getDB().set(s, null);
-            save();
-        }
-    }
 }

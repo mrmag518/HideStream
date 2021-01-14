@@ -5,6 +5,10 @@ import com.mrmag518.HideStream.Util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,27 +17,31 @@ public class Config {
     private static FileConfiguration config = null;
     private static File configFile = null;
     
-    public static boolean   ENABLED;
-    public static boolean   UPDATE_CHECKING;
-    public static boolean   PPT_ENABLED;
-    public static boolean   PPT_STREAM_ENABLED_BY_DEF;
-    public static String    NO_ACCESS_MESSAGE;
+    public static boolean       ENABLED;
+    public static boolean       UPDATE_CHECK;
+    public static boolean       PPT_ENABLED;
+    public static boolean       PPT_STREAM_ENABLED_BY_DEF;
+    public static String        NO_ACCESS_MESSAGE;
     
-    public static boolean   JOIN_HIDE;
-    public static boolean   JOIN_USE_PERMS;
-    public static int       JOIN_ONLINE_AMOUNT;
+    public static boolean       JOIN_HIDE;
+    public static boolean       JOIN_USE_PERMS;
+    public static int           JOIN_ONLINE_AMOUNT;
+    public static List<String>  JOIN_AFFECTED_WORLDS;
     
-    public static boolean   QUIT_HIDE;
-    public static boolean   QUIT_USE_PERMS;
-    public static int       QUIT_ONLINE_AMOUNT;
+    public static boolean       QUIT_HIDE;
+    public static boolean       QUIT_USE_PERMS;
+    public static int           QUIT_ONLINE_AMOUNT;
+    public static List<String>  QUIT_AFFECTED_WORLDS;
     
-    public static boolean   KICK_HIDE;
-    public static boolean   KICK_USE_PERMS;
-    public static int       KICK_ONLINE_AMOUNT;
+    public static boolean       KICK_HIDE;
+    public static boolean       KICK_USE_PERMS;
+    public static int           KICK_ONLINE_AMOUNT;
+    public static List<String>  KICK_AFFECTED_WORLDS;
     
-    public static boolean   DEATH_HIDE;
-    public static boolean   DEATH_USE_PERMS;
-    public static int       DEATH_ONLINE_AMOUNT;
+    public static boolean       DEATH_HIDE;
+    public static boolean       DEATH_USE_PERMS;
+    public static int           DEATH_ONLINE_AMOUNT;
+    public static List<String>  DEATH_AFFECTED_WORLDS;
     
     public static void init() {
         reload(); load(); reload();
@@ -41,14 +49,13 @@ public class Config {
     
     private static void load() {
         config.options().header("If you need help with these settings, please visit\n"
-                + "https://dev.bukkit.org/projects/hidestream/pages/config-explanation/ \n");
+                + "https://dev.bukkit.org/projects/hidestream/pages/config-explanation \n");
 
         config.addDefault("Enabled", true);
         config.addDefault("CheckForUpdates", true);
         config.addDefault("NoCommandPermissionMsg", "&cYou do not have permission to do that!");
         
         config.addDefault("PerPlayerToggle.Enable", false);
-        config.addDefault("PerPlayerToggle.StreamEnabledByDefault", true);
         
         for(String s : new String[]{"Join", "Quit", "Kick", "Death"}) {
             if(config.get(s + ".Enabled") != null) {
@@ -65,13 +72,19 @@ public class Config {
             config.addDefault(s + ".Permissions.UsePermissions", false);
             config.addDefault(s + ".Permissions.HideOnlyIfHasPermission", false);
             config.addDefault(s + ".Permissions.HideOnlyIfWithoutPermission", false);
+            
+            List<String> worlds = new ArrayList<>();
+            for(World w : Bukkit.getServer().getWorlds()) {
+                worlds.add(w.getName());
+            }
+            config.addDefault(s + ".AffectedWorlds", worlds);
         }
         
         getConfig().options().copyDefaults(true);
         save();
         
         ENABLED = config.getBoolean("Enabled");
-        UPDATE_CHECKING = config.getBoolean("CheckForUpdates");
+        UPDATE_CHECK = config.getBoolean("CheckForUpdates");
         NO_ACCESS_MESSAGE = config.getString("NoCommandPermissionMsg");
         PPT_ENABLED = config.getBoolean("PerPlayerToggle.Enable");
         PPT_STREAM_ENABLED_BY_DEF = config.getBoolean("PerPlayerToggle.StreamEnabledByDefault");
@@ -79,18 +92,22 @@ public class Config {
         JOIN_HIDE = config.getBoolean("Join.HideJoin");
         JOIN_USE_PERMS = config.getBoolean("Join.Permissions.UsePermissions");
         JOIN_ONLINE_AMOUNT = config.getInt("Join.NeedsToBeOnline");
+        JOIN_AFFECTED_WORLDS = (List<String>) config.getList("Join.AffectedWorlds");
         
         QUIT_HIDE = config.getBoolean("Quit.HideQuit");
         QUIT_USE_PERMS = config.getBoolean("Quit.Permissions.UsePermissions");
         QUIT_ONLINE_AMOUNT = config.getInt("Quit.NeedsToBeOnline");
+        QUIT_AFFECTED_WORLDS = (List<String>) config.getList("Quit.AffectedWorlds");
         
         KICK_HIDE = config.getBoolean("Kick.HideKick");
         KICK_USE_PERMS = config.getBoolean("Kick.Permissions.UsePermissions");
         KICK_ONLINE_AMOUNT = config.getInt("Kick.NeedsToBeOnline");
+        KICK_AFFECTED_WORLDS = (List<String>) config.getList("Kick.AffectedWorlds");
         
         DEATH_HIDE = config.getBoolean("Death.HideDeath");
         DEATH_USE_PERMS = config.getBoolean("Death.Permissions.UsePermissions");
         DEATH_ONLINE_AMOUNT = config.getInt("Death.NeedsToBeOnline");
+        DEATH_AFFECTED_WORLDS = (List<String>) config.getList("Death.AffectedWorlds");
     }
     
     public static void reload() {

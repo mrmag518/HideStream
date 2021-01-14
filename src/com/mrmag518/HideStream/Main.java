@@ -28,17 +28,14 @@ public class Main extends JavaPlugin {
         Config.init();
         if(Config.PPT_ENABLED) StreamDB.init();
         getCommand("hidestream").setExecutor(new Commands());
-        MetricsLite metrics = new MetricsLite(this);
+        MetricsLite metrics = new MetricsLite(this, 37123);
         
-        if(Config.UPDATE_CHECKING) {
-            getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
-                @Override
-                public void run() {
-                    updateCheck();
-                }
-            }, 0, 20*60*60*3);
+        if(Config.UPDATE_CHECK) {
+            getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
+                updateCheck();
+            }, 0, 20*60*60*24);
         }
-        Log.info("Version " + getDescription().getVersion() + " enabled.");
+        Log.info("Version " + getDescription().getVersion() + " enabled. (Metrics: " + metrics.isEnabled() + ". CheckForUpdates: " + Config.UPDATE_CHECK + ")");
     }
     
     public File getDataFile() {

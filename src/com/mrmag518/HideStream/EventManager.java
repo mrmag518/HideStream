@@ -23,7 +23,7 @@ public class EventManager implements Listener {
     public void handleUpdate(PlayerJoinEvent event) {
         final Player p = event.getPlayer();
         
-        if(Config.UPDATE_CHECKING && !Main.latestUpdate.equals("null") && p.hasPermission("hidestream.getupdates")) {
+        if(Config.UPDATE_CHECK && !Main.latestUpdate.equals("null") && p.hasPermission("hidestream.getupdates")) {
             Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
                 @Override
                 public void run() {
@@ -42,17 +42,15 @@ public class EventManager implements Listener {
         }
         Player p = event.getPlayer();
         
+        if(Config.JOIN_AFFECTED_WORLDS.isEmpty() || !Config.JOIN_AFFECTED_WORLDS.contains(p.getWorld().getName())) {
+            return;
+        }
+        
         if(Config.PPT_ENABLED) {
-            StreamDB.processPlayer(p);
-            
             if(StreamDB.isHidden(p.getUniqueId())) {
                 event.setJoinMessage(null);
             }
         } else {
-            if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
-                return;
-            }
-
             if(Config.JOIN_ONLINE_AMOUNT > 0) {
                 if(Bukkit.getOnlinePlayers().size() < Config.JOIN_ONLINE_AMOUNT) {
                     return;
@@ -92,14 +90,14 @@ public class EventManager implements Listener {
                 return;
             }
             Player p = event.getPlayer();
+            
+            if(Config.QUIT_AFFECTED_WORLDS.isEmpty() || !Config.QUIT_AFFECTED_WORLDS.contains(p.getWorld().getName())) {
+                return;
+            }
 
             if(Config.PPT_ENABLED && StreamDB.isHidden(p.getUniqueId())) {
                 event.setQuitMessage(null);
             } else {
-                if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
-                    return;
-                }
-
                 if(Config.QUIT_ONLINE_AMOUNT > 0) {
                     if(Bukkit.getOnlinePlayers().size() < Config.QUIT_ONLINE_AMOUNT) {
                         return;
@@ -135,14 +133,14 @@ public class EventManager implements Listener {
                 return;
             }
             Player p = event.getPlayer();
+            
+            if(Config.KICK_AFFECTED_WORLDS.isEmpty() || !Config.KICK_AFFECTED_WORLDS.contains(p.getWorld().getName())) {
+                return;
+            }
 
             if(Config.PPT_ENABLED && StreamDB.isHidden(p.getUniqueId())) {
                 event.setQuitMessage(null);
             } else {
-                if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
-                    return;
-                }
-
                 if(Config.KICK_ONLINE_AMOUNT > 0) {
                     if(Bukkit.getOnlinePlayers().size() < Config.KICK_ONLINE_AMOUNT) {
                         return;
@@ -193,13 +191,13 @@ public class EventManager implements Listener {
         }
         Player p = event.getEntity();
         
+        if(Config.DEATH_AFFECTED_WORLDS.isEmpty() || !Config.DEATH_AFFECTED_WORLDS.contains(p.getWorld().getName())) {
+            return;
+        }
+        
         if(Config.PPT_ENABLED && StreamDB.isHidden(p.getUniqueId())) {
             event.setDeathMessage(null);
         } else {
-            if(Config.PPT_STREAM_ENABLED_BY_DEF && Config.PPT_ENABLED) {
-                return;
-            }
-            
             if(Config.DEATH_ONLINE_AMOUNT > 0) {
                 if(Bukkit.getOnlinePlayers().size() < Config.DEATH_ONLINE_AMOUNT) {
                     return;

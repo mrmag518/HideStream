@@ -82,7 +82,7 @@ public class Commands implements CommandExecutor {
                             sender.sendMessage(Config.colorize(Config.NO_ACCESS_MESSAGE));
                         }
                     } else {
-                        sender.sendMessage(Main.prefix + "§cUnknown command. Run §7/hidestream§c for help.");
+                        sender.sendMessage(Main.prefix + "§cUnknown command. Use §7/hidestream§c for help.");
                     }
                 }
             } else {
@@ -117,7 +117,7 @@ public class Commands implements CommandExecutor {
                         update(sender);
                     }
                     else {
-                        sender.sendMessage("Unknown command. Run '/hidestream' for help.");
+                        sender.sendMessage("Unknown command. Use '/hidestream' for help.");
                     }
                 }
             }
@@ -168,7 +168,7 @@ public class Commands implements CommandExecutor {
                     Config.DEATH_ONLINE_AMOUNT = i;
                 }
                 sender.sendMessage(Main.prefix + "§eThe amount of players that has to be online is now: §7" + i);
-                sender.sendMessage(Main.prefix + "§3This change goes for §eall §3stream categories(§7Join, Quit, Kick and Death§3).");
+                sender.sendMessage(Main.prefix + "§3This change goes for §eall §3stream categories (§7Join, Quit, Kick and Death§3).");
             } else {
                 if(category.equalsIgnoreCase("join") || category.equalsIgnoreCase("j")) {
                     Config.getConfig().set("Join.NeedsToBeOnline", i);
@@ -189,10 +189,10 @@ public class Commands implements CommandExecutor {
                 } else {
                     sender.sendMessage(Main.prefix + "§cThe category §7" + category + " §cwas not recognized.");
                     sender.sendMessage(Main.prefix + "§3Categories: §eJoin§3, §eQuit§3, §eKick §3and §eDeath§3.");
-                    sender.sendMessage(Main.prefix + "§3If you want switch the count globally, use §e/hs onlineamount §3" + i);
+                    sender.sendMessage(Main.prefix + "§3If you want switch the count globally, use '§e/hs onlineamount §7" + i + "§e'");
                     return;
                 }
-                sender.sendMessage(Main.prefix + "§eThe amount of players that has to be online is now: §7" + i);
+                sender.sendMessage(Main.prefix + "§eAmount of players that has to be online is now: §7" + i);
                 sender.sendMessage(Main.prefix + "§3This change goes for the category: §e" + category);
             }
         } catch(NumberFormatException e) {
@@ -201,7 +201,7 @@ public class Commands implements CommandExecutor {
     }
     
     private void update(final CommandSender sender) {
-        if(Config.UPDATE_CHECKING) {
+        if(Config.UPDATE_CHECK) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -260,51 +260,48 @@ public class Commands implements CommandExecutor {
     
     private void toggleHidden(final CommandSender sender, final String target) {
         if(Config.PPT_ENABLED) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    UUID uuid = null;
-                    OfflinePlayer op = Bukkit.getOfflinePlayer(target);
-                    
-                    if(Bukkit.getOnlineMode()) {
-                        if(op.isOnline()) {
-                            uuid = op.getUniqueId();
-                        } else {
-                            sender.sendMessage(Main.prefix + "§7Fetching player UUID ..");
-                            try {
-                                uuid = new UUIDFetcher(Arrays.asList(target)).call().get(target);
-                            } catch (Exception ex) {}
-                        }
-                    } else {
+            new Thread(() -> {
+                UUID uuid = null;
+                OfflinePlayer op = Bukkit.getOfflinePlayer(target);
+                
+                if(Bukkit.getOnlineMode()) {
+                    if(op.isOnline()) {
                         uuid = op.getUniqueId();
-                    }
-                    
-                    if(uuid == null) {
-                        sender.sendMessage(Main.prefix + "§cCould not fetch UUID for §7" + target + "§c!");
-                        return;
-                    }
-                    
-                    if(StreamDB.getDB().get(target.toLowerCase()) != null) {
-                        StreamDB.getDB().set(target.toLowerCase(), null);
-                        StreamDB.save();
-                    }
-                    
-                    if(StreamDB.isHidden(uuid)) {
-                        StreamDB.setHidden(uuid, false);
-
-                        if(sender.getName().equalsIgnoreCase(target)) {
-                            sender.sendMessage(Main.prefix + "§eStream messages will now be shown for §7you§e.");
-                        } else {
-                            sender.sendMessage(Main.prefix + "§eStream messages will now be shown for §7" + target + "§e.");
-                        }
                     } else {
-                        StreamDB.setHidden(uuid, true);
-
-                        if(sender.getName().equalsIgnoreCase(target)) {
-                            sender.sendMessage(Main.prefix + "§eStream messages will now be hidden for §7you§e.");
-                        } else {
-                            sender.sendMessage(Main.prefix + "§eStream messages will now be hidden for §7" + target + "§e.");
-                        }
+                        sender.sendMessage(Main.prefix + "§7Fetching player UUID ..");
+                        try {
+                            uuid = new UUIDFetcher(Arrays.asList(target)).call().get(target);
+                        } catch (Exception ex) {}
+                    }
+                } else {
+                    uuid = op.getUniqueId();
+                }
+                
+                if(uuid == null) {
+                    sender.sendMessage(Main.prefix + "§cCould not fetch UUID for §7" + target + "§c!");
+                    return;
+                }
+                
+                if(StreamDB.getDB().get(target.toLowerCase()) != null) {
+                    StreamDB.getDB().set(target.toLowerCase(), null);
+                    StreamDB.save();
+                }
+                
+                if(StreamDB.isHidden(uuid)) {
+                    StreamDB.setHidden(uuid, false);
+                    
+                    if(sender.getName().equalsIgnoreCase(target)) {
+                        sender.sendMessage(Main.prefix + "§eYour stream messages will now be shown!");
+                    } else {
+                        sender.sendMessage(Main.prefix + "§eStream messages will now be shown for §7" + target + "§e.");
+                    }
+                } else {
+                    StreamDB.setHidden(uuid, true);
+                    
+                    if(sender.getName().equalsIgnoreCase(target)) {
+                        sender.sendMessage(Main.prefix + "§eYour stream messages will now be hidden!");
+                    } else {
+                        sender.sendMessage(Main.prefix + "§eStream messages will now be hidden for §7" + target + "§e.");
                     }
                 }
             }).start();
