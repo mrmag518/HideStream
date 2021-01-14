@@ -1,4 +1,4 @@
-3.10
+Version 3.10
 * Fixed the link in the header of the configuration file not working correctly.
 * Added multiworld support for each stream category.
 ** Example: If a player joins a world where stream is allowed, the join message will be allowed to display.
