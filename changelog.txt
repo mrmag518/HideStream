@@ -1,3 +1,15 @@
+3.10
+* Fixed the link in the header of the configuration file not working correctly.
+* Added multiworld support for each stream category.
+** Example: If a player joins a world where stream is allowed, the join message will be allowed to display.
+** Stream from all worlds are by default controlled by HideStream, meaning that no world is exempt from stream messages by default.
+** To exempt worlds from stream, remove them from the "x.AffectedWorlds" list in the configuration file.
+* Removed the setting "StreamEnabledByDefault" under PerPlayerToggle category in the configuration file.
+** This function never really served a good purpose.
+** All stream settings, except for "x.AffectedWorlds", will now be ignored if PerPlayerToggle is enabled. This basically works just like it always has.
+* Improved some output responses.
+* Updater will now only run the check once every 24th hour instead of every 3rd.
+
 Version 3.9
 * Updated to officially support Minecraft // Spigot // Bukkit 1.14.4
 * Added a new command which allows you to change/configure the amount of players that has to be online in order for stream messages to  be hidden(affected to HideStream) in-game. 
